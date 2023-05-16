@@ -8,3 +8,8 @@ TODO
 - Deelopdrachten
     - Assignment 1: Corner detectie (Wachten op parameter finetuning)
     - Assignment 2: ... 
+
+- Matching verbeteren
+    - Gewogen som van ~20 returns nemen om zaal beter te bepalen
+    - # Flann matches mee returnen om zo te bepalen of het een goeie match is
+    - Van alle gevonden paintings enkel de beste match gebruiken

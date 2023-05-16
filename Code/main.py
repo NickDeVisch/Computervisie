@@ -16,7 +16,7 @@ findPainting = FindPainting()
 matching = Matching(getDataFromDrive.keypoints, getDataFromDrive.descriptors, getDataFromDrive.df, url)
 floorPlan = Floorplan(url)
 
-cameraMatrix = np.array([[582.02639453, 0., 647.52365408],[0., 586.04899393, 339.20774435],[0., 0., 1.]])
+cameraMatrix = np.array([[582.02639453, 0., 647.52365408], [0., 586.04899393, 339.20774435],[0., 0., 1.]])
 distCoeffs = np.array([[-2.42003542e-01,  7.01396093e-02, -8.30073220e-04, 9.71570940e-05, -1.02586096e-02]])
 
 # Load video
@@ -28,7 +28,7 @@ for i in range(int(video.get(cv2.CAP_PROP_FRAME_COUNT))):
     # Get frame from video, undistort and resize it
     ret, frame = video.read()
     frame = cv2.undistort(frame, cameraMatrix, distCoeffs)
-    frame = cv2.resize(frame, (int(frame.shape[1] * 100 / 100), int(frame.shape[0] * 100 / 100)), cv2.INTER_AREA)
+    frame = cv2.resize(frame, (int(frame.shape[1] * 50 / 100), int(frame.shape[0] * 50 / 100)), cv2.INTER_AREA)
 
     if goodMatch:
         if i%360 == 0: 
@@ -55,5 +55,3 @@ for i in range(int(video.get(cv2.CAP_PROP_FRAME_COUNT))):
     cv2.imshow('Video', ResizeImage(frame))
     cv2.waitKey(1)
 cv2.destroyAllWindows()   
-
-print('Louis')
