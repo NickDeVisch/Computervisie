@@ -56,8 +56,12 @@ for i in range(int(video.get(cv2.CAP_PROP_FRAME_COUNT))):
     cv2.waitKey(1)
 cv2.destroyAllWindows()   
 
+<<<<<<< HEAD
 print('u mama')
 print('je pa')
 print('Louis heeft een kleine piet')
 print('etestfzerer')
 
+=======
+print('Louis')
+>>>>>>> e22be07b57e8395d414d43d95305ae4b196d4868
