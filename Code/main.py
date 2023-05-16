@@ -57,3 +57,4 @@ for i in range(int(video.get(cv2.CAP_PROP_FRAME_COUNT))):
 cv2.destroyAllWindows()   
 
 print('Louis')
+print('Nick')
