@@ -8,5 +8,3 @@ TODO
 - Deelopdrachten
     - Assignment 1: Corner detectie (Wachten op parameter finetuning)
     - Assignment 2: ... 
-
-- Github doen werken
