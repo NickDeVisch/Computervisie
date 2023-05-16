@@ -9,7 +9,7 @@ from ModuleMatcher import Matching
 from ModuleFloorPlan import Floorplan
 from ModuleDisplayScreen import ResizeImage
 
-url = 'D:\\School\\UGent\\AUT 5\\Computervisie\\Project'
+url = 'D:\\School\\UGent\\AUT 5\\Computervisie\\Computervisie'
 
 getDataFromDrive = GetDataFromDrive(url)
 findPainting = FindPainting()

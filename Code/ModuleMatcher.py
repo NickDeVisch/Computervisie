@@ -156,6 +156,7 @@ class Matching:
     resultFlann = []
     for index, row in df_result.iterrows():
       resultFlann.append(self.__FlannMatching(self.descriptors[df_result['naam'][index]], descr))
+    df_result['flannAmount'] = resultFlann
     maxFlann = max(resultFlann)
     df_result['flann'] = [float(i/maxFlann) for i in resultFlann]
     del resultFlann
