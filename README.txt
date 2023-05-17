@@ -1,5 +1,6 @@
 TODO
 - cameraMatrix en distCoeffs voor alle camera's / lenzen
+
 - Painting detector verbeteren bij kleine foto's => Parameters aanpassen
     - Multi threading toepassen => Kijken welke functies het langste duren
 
@@ -18,5 +19,3 @@ TODO
         - Verhouding van # matches tov 2de beste match (kleiner verschil tov 2de bij slechte match)
     - Van alle gevonden paintings enkel de beste match gebruiken
     - Indien andere room zou zijn, de x aantal volgende frames checken of dit wel zo is, indien zo dan pas room tovoegen
-
-- Functie voor appenden van room in matchen

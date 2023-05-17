@@ -21,7 +21,7 @@ cameraMatrix = np.array([[582.02639453, 0., 647.52365408], [0., 586.04899393, 33
 distCoeffs = np.array([[-2.42003542e-01,  7.01396093e-02, -8.30073220e-04, 9.71570940e-05, -1.02586096e-02]])
 
 # Load video
-videoUrl =  url + '\\Videos\\GoPro\\MSK_17.mp4'
+videoUrl =  url + '\\Videos\\GoPro\\MSK_16.mp4'
 video = cv2.VideoCapture(videoUrl)
 
 goodMatch = False
@@ -53,18 +53,7 @@ for i in range(int(video.get(cv2.CAP_PROP_FRAME_COUNT))):
         
         if goodMatch:
             matchResult = goodMatches[goodMatches['flannAmount'] == goodMatches['flannAmount'].max()]
-            print(matchResult)
-            room = matchResult['naam'].values[0].split('__')[0]
-            room = room[0].lower() + room[1:]
-            if len(matching.lastMatches) == 5:
-                matching.lastMatches.pop(0)
-            matching.lastMatches.append(room)
-
-            if len(matching.roomSequence) == 0: 
-                matching.roomSequence.append(room)
-            else: 
-                if matching.roomSequence[-1] != room: 
-                    matching.roomSequence.append(room)
+            matching.AppendRoom(matchResult['naam'].values[0].split('__')[0])
 
             matchPainting = ResizeImage(cv2.imread(url + '\\Database\\' + matchResult['naam'].values[0]))
             floorplan = floorPlan.DrawPath(matching.roomSequence)
