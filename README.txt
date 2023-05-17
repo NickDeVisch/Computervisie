@@ -7,7 +7,9 @@ TODO
 
 - Deelopdrachten
     - Assignment 1: Corner detectie (Wachten op parameter finetuning)
-    - Assignment 2: ... 
+    - Assignment 2: database matchen tegen zichzelf en verschil tussen twee beste resultaten bijhouden => gemiddelde nemen hiervan
+    - Assignment 2: database matchen met beelden van video en verschil tussen twee beste resultaten bijhouden => gemiddelde nemen hiervan
+        Hiervoor eerst alle beelden door functie van assignemnt 1 laten lopen
 
 - Matching verbeteren
     - Gewogen som van ~20 returns nemen om zaal beter te bepalen
