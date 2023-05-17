@@ -12,4 +12,6 @@ TODO
 - Matching verbeteren
     - Gewogen som van ~20 returns nemen om zaal beter te bepalen
     - # Flann matches mee returnen om zo te bepalen of het een goeie match is
+        - Totaal # matches vergelijken
+        - Verhouding van # matches tov 2de beste match (kleiner verschil tov 2de bij slechte match)
     - Van alle gevonden paintings enkel de beste match gebruiken
