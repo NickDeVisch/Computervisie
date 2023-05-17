@@ -2,6 +2,7 @@ import os
 import cv2
 import time
 import numpy as np
+import pandas as pd
 
 from ModuleGetData import GetDataFromDrive
 from ModuleFindPainting import FindPainting
@@ -40,10 +41,30 @@ for i in range(int(video.get(cv2.CAP_PROP_FRAME_COUNT))):
         print('Frame', i, 'Finding painting')
         extraxtList = findPainting.FindPainting(frame)
         if len(extraxtList): print('Matching, Paintings found:', len(extraxtList))
+        goodMatches = pd.DataFrame()
         for extraxt in extraxtList:
             matchResult = matching.MatchPainting(extraxt)
-            
-            goodMatch = True
+            flannAmount_1 = matchResult[:1]['flannAmount'].values[0]
+            flannAmount_2 = matchResult[1:2]['flannAmount'].values[0]
+            print(flannAmount_1, flannAmount_2)
+            if (flannAmount_1 > 2.5 * flannAmount_2 and flannAmount_1 > 150) or flannAmount_1 > 200:
+                goodMatch = True
+                goodMatches = pd.concat([goodMatches, matchResult[:1]])
+        
+        if goodMatch:
+            matchResult = goodMatches[goodMatches['flannAmount'] == goodMatches['flannAmount'].max()]
+            print(matchResult)
+            room = matchResult['naam'].values[0].split('__')[0]
+            room = room[0].lower() + room[1:]
+            if len(matching.lastMatches) == 5:
+                matching.lastMatches.pop(0)
+            matching.lastMatches.append(room)
+
+            if len(matching.roomSequence) == 0: 
+                matching.roomSequence.append(room)
+            else: 
+                if matching.roomSequence[-1] != room: 
+                    matching.roomSequence.append(room)
 
             matchPainting = ResizeImage(cv2.imread(url + '\\Database\\' + matchResult['naam'].values[0]))
             floorplan = floorPlan.DrawPath(matching.roomSequence)

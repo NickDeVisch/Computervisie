@@ -193,20 +193,6 @@ class Matching:
     # Make combined classification
     df_result['total'] = df_result['flann'] * weightFlann + df_result['hist'] * weightHist + df_result['comred'] * weightComRed + df_result['patches'] * weightPatches
     print(df_result.sort_values(by=['total'], ascending=False)[:5]) #REMOVE
-    df_result = df_result.sort_values(by=['total'], ascending=False)[:1]
-
-    # Append to list
-    room = df_result['naam'].values[0].split('__')[0]
-    room = room[0].lower() + room[1:]
-
-    if len(self.lastMatches) == 5:
-      self.lastMatches.pop(0)
-    self.lastMatches.append(room)
-
-    if len(self.roomSequence) == 0: 
-      self.roomSequence.append(room)
-    else: 
-      if self.roomSequence[-1] != room: 
-        self.roomSequence.append(room)
-        
+    df_result = df_result.sort_values(by=['total'], ascending=False)[:5]
+    
     return df_result
