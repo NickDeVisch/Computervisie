@@ -62,4 +62,24 @@ def FindCornersPainting(img):
   img_copy = img.copy()
   cv2.drawContours(img_copy, quadrilateral_list, -1, (0, 255, 0), 5)
 
-  return img_copy
+  return [img_copy]
+
+
+def ReplaceColorWithWhite(image, lower_color, upper_color):
+    # Converteer de afbeelding naar het HSV-kleursysteem
+    hsv_image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+    #hsv_image = cv2.resize(hsv_image, (int(hsv_image.shape[1] * 5 / 100), int(hsv_image.shape[0] * 5 / 100)), cv2.INTER_AREA)
+    
+    # Definieer het bereik van kleuren om te vervangen
+    lower_bound = np.array(lower_color, dtype=np.uint8)
+    upper_bound = np.array(upper_color, dtype=np.uint8)
+    
+    # Creëer een masker op basis van het kleurbereik
+    mask = cv2.inRange(hsv_image, lower_bound, upper_bound)
+    
+    # Vervang de pixels in het masker door wit
+    replaced_image = image.copy()
+    replaced_image[mask != 0] = (255, 255, 255)  # Witte kleur
+    
+    return replaced_image
+

@@ -6,7 +6,7 @@ import pandas as pd
 
 from ModuleGetData import GetDataFromDrive
 from ModuleFindPainting import FindPainting
-from ModuleFindPainting_v2 import FindCornersPainting
+from ModuleFindPainting_v2 import FindCornersPainting, ReplaceColorWithWhite
 from ModuleMatcher import Matching
 from ModuleFloorPlan import Floorplan
 from ModuleDisplayScreen import ResizeImage
@@ -31,7 +31,7 @@ if __name__ == '__main__':
         # Get frame from video, undistort and resize it
         ret, frame = video.read()
         frame = cv2.undistort(frame, cameraMatrix, distCoeffs)
-        #frame = cv2.resize(frame, (int(frame.shape[1] * 50 / 100), int(frame.shape[0] * 50 / 100)), cv2.INTER_AREA)
+        frame = cv2.resize(frame, (int(frame.shape[1] * 25 / 100), int(frame.shape[0] * 25 / 100)), cv2.INTER_AREA)
 
         if goodMatch:
             if i%360 == 0: 
@@ -44,35 +44,11 @@ if __name__ == '__main__':
 
             # FindPainting_v2
             extraxtList = FindCornersPainting(frame)
-            print(len(extraxtList))
             for extraxt in extraxtList:
-                cv2.imshow('Extract', extraxt)
-
-            # FindPainting (Ruben)
-            extraxtList = findPainting.FindPainting(frame)
-            if len(extraxtList): print('Matching, Paintings found:', len(extraxtList))
-            goodMatches = pd.DataFrame()
-            for extraxt in extraxtList:
-                matchResult = matching.MatchPainting(extraxt)
-                flannAmount_1 = matchResult[:1]['flannAmount'].values[0]
-                flannAmount_2 = matchResult[1:2]['flannAmount'].values[0]
-                print(flannAmount_1, flannAmount_2)
-                if (flannAmount_1 > 2.5 * flannAmount_2 and flannAmount_1 > 150) or flannAmount_1 > 200:
-                    goodMatch = True
-                    goodMatches = pd.concat([goodMatches, matchResult[:1]])
-            
-            if goodMatch:
-                matchResult = goodMatches[goodMatches['flannAmount'] == goodMatches['flannAmount'].max()]
-                matching.AppendRoom(matchResult['naam'].values[0].split('__')[0])
-
-                matchPainting = ResizeImage(cv2.imread(url + '\\Database\\' + matchResult['naam'].values[0]))
-                floorplan = floorPlan.DrawPath(matching.roomSequence)
-
-                cv2.imshow('Best match', matchPainting)
-                cv2.imshow('Extract', extraxt)
-                cv2.imshow('Floorplan', floorplan)
+                extraxt = ReplaceColorWithWhite(extraxt, [169, 118, 138], [180, 130, 148])
+                cv2.imshow('Video', ResizeImage(extraxt))
 
 
-        cv2.imshow('Video', ResizeImage(frame))
+        #cv2.imshow('Video', ResizeImage(frame))
         cv2.waitKey(1)
     cv2.destroyAllWindows()   
