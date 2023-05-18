@@ -3,9 +3,10 @@ import cv2
 import math
 import time
 import random
+import random
 import numpy as np
 import pandas as pd
-import random
+import multiprocessing
 from matplotlib import pyplot as plt
 
 class FindPainting:
@@ -24,6 +25,7 @@ class FindPainting:
 
     # Create a mask of the largest segment (wall)
     def largest_segment(img,color):
+      start = time.time()
       assert img is not None
       cl = img.copy()
       mask = np.zeros((img.shape[0]+2, img.shape[1]+2), dtype=np.uint8)
@@ -39,6 +41,8 @@ class FindPainting:
                   if segment_size > largest_segment:
                       largest_segment = segment_size
                       wallColor = newVal
+      end = time.time()
+      #print('LargestSegment:', end - start)
       return cv2.inRange(cl, wallColor, wallColor)
 
     # Dilate the mask to remove noise
@@ -210,6 +214,8 @@ class FindPainting:
         return sorted
   # Start --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+    startTime = time.time()
+
     # Variabelen------------------------------------------
     # Mean-shift
     spatial_radius = 7
@@ -235,7 +241,6 @@ class FindPainting:
     corner_quality = 0.001
     minimum_distance = 20
     #--------------------------------------------------------
-    startTime = time.time()
 
     # Perform Mean-Shift Segmentation on the image
     image_original = img_original.copy()
@@ -383,7 +388,7 @@ class FindPainting:
         #cv2.circle(mask, (x,y), int(0.01 * max(img.shape[0], img.shape[1])), (255, 0, 0), -1)
       img_corners1.append(mask)
 
-    if self.debug: print('Duration: ', time.time() - startTime, 's')
+    #print('Duration: ', time.time() - startTime, 's')
 
     return img_corners1
 

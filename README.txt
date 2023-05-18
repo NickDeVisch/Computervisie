@@ -1,5 +1,5 @@
 TODO
-- cameraMatrix en distCoeffs voor alle camera's / lenzen
+- cameraMatrix en distCoeffs voor ALLE camera's / lenzen
 
 - Painting detector verbeteren bij kleine foto's => Parameters aanpassen
     - Multi threading toepassen => Kijken welke functies het langste duren
@@ -19,3 +19,14 @@ TODO
         - Verhouding van # matches tov 2de beste match (kleiner verschil tov 2de bij slechte match)
     - Van alle gevonden paintings enkel de beste match gebruiken
     - Indien andere room zou zijn, de x aantal volgende frames checken of dit wel zo is, indien zo dan pas room tovoegen
+
+- Painting detector v2
+    - Parameters verbeteren => Nick
+    - Achtergrond uitfilteren => Louis
+        - HSV bereik meegeven met functie afh v kamer
+        - Bereik uitfilteren (vervangen door wit) van frame voor betere detectie
+        - Beeld extraxten uit orig frame
+    - Hoeken van contour testen => Nick
+        - bvb: als hoek minder dan 45° of meer dan 135° is klopt dit neighColorPatch
+    - Verhouding van contour testen => Nick
+        - Als verhouding tussen lengte en breedte niet correct is ook niet meetellen
