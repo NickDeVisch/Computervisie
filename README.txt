@@ -22,6 +22,7 @@ TODO
 
 - Painting detector v2
     - Parameters verbeteren => Nick
+    - Extract returnen => Nick
     - Achtergrond uitfilteren => Louis
         - HSV bereik meegeven met functie afh v kamer
         - Bereik uitfilteren (vervangen door wit) van frame voor betere detectie
