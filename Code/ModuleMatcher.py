@@ -156,6 +156,7 @@ class Matching:
     resultFlann = []
     for index, row in df_result.iterrows():
       resultFlann.append(self.__FlannMatching(self.descriptors[df_result['naam'][index]], descr))
+    df_result['flannAmount'] = resultFlann
     maxFlann = max(resultFlann)
     df_result['flann'] = [float(i/maxFlann) for i in resultFlann]
     del resultFlann
@@ -192,14 +193,17 @@ class Matching:
     # Make combined classification
     df_result['total'] = df_result['flann'] * weightFlann + df_result['hist'] * weightHist + df_result['comred'] * weightComRed + df_result['patches'] * weightPatches
     print(df_result.sort_values(by=['total'], ascending=False)[:5]) #REMOVE
-    df_result = df_result.sort_values(by=['total'], ascending=False)[:1]
+    df_result = df_result.sort_values(by=['total'], ascending=False)[:5]
 
+    return df_result
+  
+
+  def AppendRoom(self, room):
     # Append to list
-    room = df_result['naam'].values[0].split('__')[0]
     room = room[0].lower() + room[1:]
-
+    
     if len(self.lastMatches) == 5:
-      self.lastMatches.pop(0)
+        self.lastMatches.pop(0)
     self.lastMatches.append(room)
 
     if len(self.roomSequence) == 0: 
@@ -207,5 +211,3 @@ class Matching:
     else: 
       if self.roomSequence[-1] != room: 
         self.roomSequence.append(room)
-        
-    return df_result
