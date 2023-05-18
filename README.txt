@@ -1,5 +1,5 @@
 TODO
-- cameraMatrix en distCoeffs voor ALLE camera's / lenzen
+- cameraMatrix en distCoeffs voor ALLE camera's / lenzen => Arne
 
 - Painting detector verbeteren bij kleine foto's => Parameters aanpassen
     - Multi threading toepassen => Kijken welke functies het langste duren
