@@ -23,3 +23,33 @@ UIT MAIN
                 cv2.imshow('Best match', matchPainting)
                 cv2.imshow('Extract', extraxt)
                 cv2.imshow('Floorplan', floorplan)
+
+
+
+    # Flann
+    start = time.time()
+    if self.debug: print('flann')
+    resultFlann = []
+    for index, row in df_result.iterrows():
+      resultFlann.append(self.__FlannMatching(self.descriptors[df_result['naam'][index]], descr))
+    df_result['flannAmount'] = resultFlann
+    maxFlann = max(resultFlann)
+    df_result['flann'] = [float(i/maxFlann) for i in resultFlann]
+    del resultFlann
+    print(time.time() - start)
+
+
+
+
+def __FlannMatching(self, descr1, descr2):
+    matches = self.flann.knnMatch(descr1, descr2, k=2)
+    matchesMask = [[0,0] for i in range(len(matches))]
+
+    # ratio test.
+    good = 0
+    for i,(m,n) in enumerate(matches):
+      if( m.distance < 0.7*n.distance):
+        matchesMask[i]=[1,0]
+        good += 1
+
+    return good

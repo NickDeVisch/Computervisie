@@ -5,8 +5,7 @@ import numpy as np
 import pandas as pd
 
 from ModuleGetData import GetDataFromDrive
-from ModuleFindPainting import FindPainting
-from ModuleFindPainting_v2 import FindCornersPainting, ReplaceColorWithWhite
+from ModuleFindPainting_v2 import FindPainting, ReplaceColorWithWhite
 from ModuleMatcher import Matching
 from ModuleFloorPlan import Floorplan
 from ModuleDisplayScreen import ResizeImage
@@ -15,12 +14,14 @@ if __name__ == '__main__':
     url = 'D:\\School\\UGent\\AUT 5\\Computervisie\\Computervisie'
 
     getDataFromDrive = GetDataFromDrive(url)
-    findPainting = FindPainting()
     matching = Matching(getDataFromDrive.keypoints, getDataFromDrive.descriptors, getDataFromDrive.df, url)
     floorPlan = Floorplan(url)
 
     cameraMatrix = np.array([[582.02639453, 0., 647.52365408], [0., 586.04899393, 339.20774435],[0., 0., 1.]])
     distCoeffs = np.array([[-2.42003542e-01,  7.01396093e-02, -8.30073220e-04, 9.71570940e-05, -1.02586096e-02]])
+    
+    cameraMatrix = np.array([[722.31231717, 0., 648.09282601], [0., 727.65628288, 323.11790409], [0., 0., 1.]])
+    distCoeffs = np.array([[-0.26972165, 0.11073541, 0.00049764, -0.00060387, -0.02801339]])
 
     # Load video
     videoUrl =  url + '\\Videos\\GoPro\\MSK_18.mp4'
@@ -40,7 +41,7 @@ if __name__ == '__main__':
             if i%5 != 0: continue
 
         #print('Frame', i)
-        frame, extraxtList = FindCornersPainting(frame)
+        frame, extraxtList = FindPainting(frame)
         if goodMatch == False and False:
             goodMatches = pd.DataFrame()
             for extraxt in extraxtList:

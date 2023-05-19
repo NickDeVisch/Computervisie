@@ -1,6 +1,7 @@
 import cv2
 import math
 import numpy as np
+from sympy import Point, Line
 
 
 def ReplaceColorWithWhite(image, lower_color, upper_color):
@@ -25,7 +26,7 @@ def CalculateDistance(point1, point2):
     # Bereken de afstand tussen twee punten met de afstandformule
     x_diff = point2[0] - point1[0]
     y_diff = point2[1] - point1[1]
-    distance = math.sqrt(x_diff ** 2 + y_diff ** 2)
+    distance = np.sqrt(x_diff ** 2 + y_diff ** 2)
     return distance
 
 def CheckContourRatio(points, threshold):
@@ -51,8 +52,8 @@ def CalculateAngle(point1, point2, point3):
 
     # Bereken de hoek tussen de vectoren met behulp van het inproduct en de normen
     dot_product = vector1[0] * vector2[0] + vector1[1] * vector2[1]
-    norm_vector1 = math.sqrt(vector1[0] ** 2 + vector1[1] ** 2)
-    norm_vector2 = math.sqrt(vector2[0] ** 2 + vector2[1] ** 2)
+    norm_vector1 = np.sqrt(vector1[0] ** 2 + vector1[1] ** 2)
+    norm_vector2 = np.sqrt(vector2[0] ** 2 + vector2[1] ** 2)
 
     # Bereken de cosinus van de hoek
     cosine_angle = dot_product / (norm_vector1 * norm_vector2)
@@ -84,7 +85,7 @@ def CheckCornerAngels(points, lowerThreshold, upperThreshold):
         return True
 
 def CheckParallelogram(points, diffThreshold):
-       # Get points
+    # Get points
     point1 = points[0, 0]
     point2 = points[1, 0]
     point3 = points[2, 0]
@@ -104,9 +105,90 @@ def CheckParallelogram(points, diffThreshold):
     else:
        return False
 
+def FiveToFourCorners(points, img):
+  # Get corners
+  corners = []
+  for i in range(5):
+      corners.append(points[i, 0])
+
+  # Get points that form shortest line
+  shortestDist = np.inf
+  point1 = 0
+  point2 = 0
+  for i in range(len(corners)):
+      for j in range(i, len(corners)):
+        dist = CalculateDistance(corners[i], corners[j])
+        if dist > 0.0 and dist < shortestDist:
+          shortestDist = dist
+          point1 = i
+          point2 = j
+  img = cv2.circle(img, corners[point1], 7, [0, 0, 255], 5)
+  img = cv2.circle(img, corners[point2], 7, [255, 0, 0], 5)
+
+  # Get next point in contour
+  shortestDist1 = np.inf
+  point1_next = 0
+  for i in range(len(corners)):
+    dist = CalculateDistance(corners[point1], corners[i])
+    if dist > 0.0 and dist < shortestDist1 and i != point1 and i != point2:
+      shortestDist1 = dist
+      point1_next = i
+  
+  shortestDist2 = np.inf
+  point2_next = 0
+  for i in range(len(corners)):
+    dist = CalculateDistance(corners[point2], corners[i])
+    if dist > 0.0 and dist < shortestDist2 and i != point1 and i != point2:
+      shortestDist2 = dist
+      point2_next = i
+  
+  if point1_next == point2_next:
+    if shortestDist1 < shortestDist2:
+          shortestDist2 = np.inf
+          point2_next = 0
+          for i in range(len(corners)):
+            dist = CalculateDistance(corners[point2], corners[i])
+            if dist > 0.0 and dist < shortestDist2 and i != point1 and i != point2 and i != point1_next:
+              shortestDist2 = dist
+              point2_next = i
+    else:
+      shortestDist1 = np.inf
+      point1_next = 0
+      for i in range(len(corners)):
+        dist = CalculateDistance(corners[point1], corners[i])
+        if dist > 0.0 and dist < shortestDist1 and i != point1 and i != point2 and i != point2_next:
+          shortestDist1 = dist
+          point1_next = i
+    
+    img = cv2.circle(img, corners[point1_next], 7, [0, 0, 255], 5)
+    img = cv2.circle(img, corners[point2_next], 7, [255, 0, 0], 5)
+
+    # Line 1
+    p1 = Point(corners[point1])
+    p2 = Point(corners[point1_next])
+    l1 = Line(p1, p2)
+
+    # Line 2
+    p3 = Point(corners[point2])
+    p4 = Point(corners[point2_next])
+    l2 = Line(p3, p4)
+
+    # Find intersection
+    intersection = l1.intersection(l2)
+    newCorner = [int(intersection[0].x), int(intersection[0].y)]
+    img = cv2.circle(img, (int(intersection[0].x), int(intersection[0].y)), 7, [0, 255, 255], 5)
+
+    # Change corners of contour
+    for i in range(len(corners)):
+      if i != point1 and i != point1_next and i != point2 and i != point2_next:
+        lastCorner = corners[i]
+    newCorners = np.array([[newCorner],[ corners[point1_next]], [lastCorner], [corners[point2_next]]])
+    
+    return newCorners
 
 
-def FindCornersPainting(img):
+
+def FindPainting(img):
   # Covert to gray
   img_gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
 
@@ -162,19 +244,20 @@ def FindCornersPainting(img):
   threshold_diffAngle = 10
 
   quadrilateral_list = []
-  test = []
   for hull in hull_list:
     approx = cv2.approxPolyDP(hull, 0.015 * cv2.arcLength(hull, True), True)
     if len(approx) == 4:
       if CheckContourRatio(approx, threshold_ratio) and CheckParallelogram(approx, threshold_diffAngle):
         quadrilateral_list.append(approx)
     if len(approx) == 5:
-       test.append(approx)
+      newContour = FiveToFourCorners(approx, img)
+      if newContour is not None: 
+        if CheckContourRatio(newContour, threshold_ratio) and CheckParallelogram(newContour, threshold_diffAngle) and CheckCornerAngels(newContour, threshold_lowerAngle, threshold_upperAngle):
+          quadrilateral_list.append(newContour)
 
   # Draw quadrilateral
   imgContour = img.copy()
   cv2.drawContours(imgContour, quadrilateral_list, -1, (0, 255, 0), 5)
-  cv2.drawContours(imgContour, test, -1, (0, 0, 255), 5)
 
   # Extract painting
   extraxtList = []
@@ -188,7 +271,4 @@ def FindCornersPainting(img):
     extraxtList.append(extraxt[min(y):max(y), min(x):max(x)])
 
   return imgContour, extraxtList
-
-
-
 

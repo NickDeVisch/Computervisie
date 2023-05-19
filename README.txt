@@ -1,9 +1,4 @@
 TODO
-- cameraMatrix en distCoeffs voor ALLE camera's / lenzen => Bram
-
-- Painting detector verbeteren bij kleine foto's => Parameters aanpassen
-    - Multi threading toepassen => Kijken welke functies het langste duren
-
 - Grafiek voor detecties (Assignment 4 ofz)
 
 - Deelopdrachten
@@ -27,6 +22,4 @@ TODO
         - Bereik uitfilteren (vervangen door wit) van frame voor betere detectie
         - Toepassen op een vekleinde foto !!!! (Duurt zeer lang), dan opnieuw vergroten en toepassen op frame
         - Beeld extraxten uit orig frame
-    - 5-Hoeken veranderen naar 4-hoeken => Nick
-        - Interpolatie van lijnen om nieuwe hoek te vinden
 
