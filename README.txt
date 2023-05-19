@@ -1,6 +1,8 @@
 TODO
 - Grafiek voor detecties (Assignment 4 ofz)
 
+- Naam van painting printen in match
+
 - Deelopdrachten
     - Assignment 1: Corner detectie (Wachten op parameter finetuning)
     - Assignment 2: database matchen tegen zichzelf en verschil tussen twee beste resultaten bijhouden => gemiddelde nemen hiervan
