@@ -1,5 +1,5 @@
 TODO
-- cameraMatrix en distCoeffs voor ALLE camera's / lenzen => Arne
+- cameraMatrix en distCoeffs voor ALLE camera's / lenzen => Bram
 
 - Painting detector verbeteren bij kleine foto's => Parameters aanpassen
     - Multi threading toepassen => Kijken welke functies het langste duren
@@ -22,12 +22,11 @@ TODO
 
 - Painting detector v2
     - Parameters verbeteren => Nick
-    - Extract returnen => Nick
     - Achtergrond uitfilteren => Louis
         - HSV bereik meegeven met functie afh v kamer
         - Bereik uitfilteren (vervangen door wit) van frame voor betere detectie
+        - Toepassen op een vekleinde foto !!!! (Duurt zeer lang), dan opnieuw vergroten en toepassen op frame
         - Beeld extraxten uit orig frame
-    - Hoeken van contour testen => Nick
-        - bvb: als hoek minder dan 45° of meer dan 135° is klopt dit neighColorPatch
-    - Verhouding van contour testen => Nick
-        - Als verhouding tussen lengte en breedte niet correct is ook niet meetellen
+    - 5-Hoeken veranderen naar 4-hoeken => Nick
+        - Interpolatie van lijnen om nieuwe hoek te vinden
+
