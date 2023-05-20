@@ -194,7 +194,7 @@ class Matching:
     # Make combined classification
     df_result['total'] = df_result['flann'] * weightFlann + df_result['hist'] * weightHist + df_result['comred'] * weightComRed + df_result['patches'] * weightPatches
     print(df_result.sort_values(by=['total'], ascending=False)[:5]) #REMOVE
-    df_result = df_result.sort_values(by=['total'], ascending=False)[:5]
+    df_result = df_result.sort_values(by=['total'], ascending=False)[:20] #DEZE WAARDE VERANDERT VAN 5 naar 20
 
     return df_result
   
@@ -203,7 +203,7 @@ class Matching:
     # Append to list
     room = room[0].lower() + room[1:]
     
-    if len(self.lastMatches) == 5:
+    if len(self.lastMatches) == 20: #DEZE WAARDE VERANDERT VAN 5 NAAR 20
         self.lastMatches.pop(0)
     self.lastMatches.append(room)
 

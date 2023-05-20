@@ -1,6 +1,7 @@
 import os
 import cv2
 import time
+from collections import Counter
 import numpy as np
 import pandas as pd
 
@@ -54,6 +55,9 @@ if __name__ == '__main__':
             
             if goodMatch:
                 matchResult = goodMatches[goodMatches['flannAmount'] == goodMatches['flannAmount'].max()]
+                #freq=Counter(matchResult['naam'])
+                #most_freq, _ = freq.most_common(1)[0]
+                #matching.AppendRoom(most_freq.split('__')[0])
                 matching.AppendRoom(matchResult['naam'].values[0].split('__')[0])
 
                 matchPainting = ResizeImage(cv2.imread(url + '\\Database\\' + matchResult['naam'].values[0]))
