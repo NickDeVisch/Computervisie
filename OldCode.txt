@@ -53,3 +53,7 @@ def __FlannMatching(self, descr1, descr2):
         good += 1
 
     return good
+
+
+  cv2.imshow('Filter', img_copy)
+  cv2.waitKey(0)

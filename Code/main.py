@@ -25,7 +25,7 @@ if __name__ == '__main__':
     distCoeffs = np.array([[-0.26972165, 0.11073541, 0.00049764, -0.00060387, -0.02801339]])
 
     # Load video
-    videoUrl =  url + '\\Videos\\GoPro\\MSK_18.mp4'
+    videoUrl =  url + '\\Videos\\GoPro\\MSK_17.mp4'
     video = cv2.VideoCapture(videoUrl)
 
     goodMatch = False
@@ -33,7 +33,6 @@ if __name__ == '__main__':
         # Get frame from video abd undistort it
         ret, frame = video.read()
         frame = cv2.undistort(frame, cameraMatrix, distCoeffs)
-        #frame = cv2.resize(frame, (int(frame.shape[1] * 25 / 100), int(frame.shape[0] * 25 / 100)), cv2.INTER_AREA)
 
         if goodMatch:
             if i%180 == 0: 
@@ -42,7 +41,7 @@ if __name__ == '__main__':
             if i%5 != 0: continue
 
         #print('Frame', i)
-        frame, extraxtList = FindPainting(frame)
+        frame, extraxtList = FindPainting(frame, 'Zaal 5')
         if goodMatch == False:
             goodMatches = pd.DataFrame()
             for extraxt in extraxtList:
@@ -54,15 +53,22 @@ if __name__ == '__main__':
                     goodMatches = pd.concat([goodMatches, matchResult[:1]])
             
             if goodMatch:
+                # Get best match and add to room sequence
                 matchResult = goodMatches[goodMatches['flannAmount'] == goodMatches['flannAmount'].max()]
                 #freq=Counter(matchResult['naam'])
                 #most_freq, _ = freq.most_common(1)[0]
                 #matching.AppendRoom(most_freq.split('__')[0])
                 matching.AppendRoom(matchResult['naam'].values[0].split('__')[0])
 
-                matchPainting = ResizeImage(cv2.imread(url + '\\Database\\' + matchResult['naam'].values[0]))
+                # Get matching painting from database and print name in it
+                matchPainting = cv2.imread(url + '\\Database\\' + matchResult['naam'].values[0])
+                matchPainting = cv2.putText(matchPainting, matchResult['naam'].values[0], (50, 125), cv2.FONT_HERSHEY_SIMPLEX, 3, (0, 255, 0), 10, cv2.LINE_AA, False)
+                matchPainting = ResizeImage(matchPainting)
+
+                # Update floorplan
                 floorplan = floorPlan.DrawPath(matching.roomSequence)
 
+                # Generate windows
                 cv2.imshow('Best match', matchPainting)
                 cv2.imshow('Extract', ResizeImage(extraxt))
                 cv2.imshow('Floorplan', floorplan)
