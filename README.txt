@@ -25,3 +25,9 @@ TODO
     - Kader in kader filteren
     - Room voor HSV filter
 
+ - Paper
+    - Deel 4 afwerken (Arne)
+    - Nalezen van paper + eventuele opmerkingen die Bram kan verwerken (iedereen)
+    - Resultaten ass1 
+    - Resultaten ass2
+    - Volledig resultaat van bevindingen
