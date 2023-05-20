@@ -1,7 +1,7 @@
 import os
 import cv2
 import time
-from collections import Counter
+import collections
 import numpy as np
 import pandas as pd
 
@@ -55,10 +55,13 @@ if __name__ == '__main__':
             if goodMatch:
                 # Get best match and add to room sequence
                 matchResult = goodMatches[goodMatches['flannAmount'] == goodMatches['flannAmount'].max()]
-                #freq=Counter(matchResult['naam'])              #Code Louis
-                #most_freq, _ = freq.most_common(1)[0]          #Code Louis
-                #matching.AppendRoom(most_freq.split('__')[0])  #Code Louis
-                matching.AppendRoom(matchResult['naam'].values[0].split('__')[0]) #Code Louis (deze lijn mag weg als dit nieuw systeem werkt)
+                #tempRooms=collections.deque(["dummy1", "dummy2", "dummy3", "dummy4", "dummy5"])             #eerste werkelijke zaal zal naar buiten gebracht worden
+                #tempRooms.appendleft(matchResult['naam'].values[0].split('__')[0])
+                #tempRooms.pop
+                #freq=collections.Counter(tempRooms)
+                #mostFreq,_=freq.most_common(1)[0]
+                #matching.AppendRoom(mostFreq) #NIET ZEKER VAN DEZE IMPLEMENTATIE
+                matching.AppendRoom(matchResult['naam'].values[0].split('__')[0]) 
 
                 # Get matching painting from database and print name in it
                 matchPainting = cv2.imread(url + '\\Database\\' + matchResult['naam'].values[0])
