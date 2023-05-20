@@ -42,7 +42,7 @@ if __name__ == '__main__':
 
         #print('Frame', i)
         frame, extraxtList = FindPainting(frame)
-        if goodMatch == False and False:
+        if goodMatch == False:
             goodMatches = pd.DataFrame()
             for extraxt in extraxtList:
                 matchResult = matching.MatchPainting(extraxt)

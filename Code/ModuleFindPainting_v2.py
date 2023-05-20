@@ -160,31 +160,38 @@ def FiveToFourCorners(points, img):
           shortestDist1 = dist
           point1_next = i
     
-    img = cv2.circle(img, corners[point1_next], 7, [0, 0, 255], 5)
-    img = cv2.circle(img, corners[point2_next], 7, [255, 0, 0], 5)
+  img = cv2.circle(img, corners[point1_next], 7, [0, 0, 255], 5)
+  img = cv2.circle(img, corners[point2_next], 7, [255, 0, 0], 5)
 
-    # Line 1
-    p1 = Point(corners[point1])
-    p2 = Point(corners[point1_next])
-    l1 = Line(p1, p2)
+  # Line 1
+  p1 = Point(corners[point1])
+  p2 = Point(corners[point1_next])
+  l1 = Line(p1, p2)
 
-    # Line 2
-    p3 = Point(corners[point2])
-    p4 = Point(corners[point2_next])
-    l2 = Line(p3, p4)
+  # Line 2
+  p3 = Point(corners[point2])
+  p4 = Point(corners[point2_next])
+  l2 = Line(p3, p4)
 
-    # Find intersection
-    intersection = l1.intersection(l2)
-    newCorner = [int(intersection[0].x), int(intersection[0].y)]
-    img = cv2.circle(img, (int(intersection[0].x), int(intersection[0].y)), 7, [0, 255, 255], 5)
+  # Find intersection
+  intersection = l1.intersection(l2)
+  newCorner = [int(intersection[0].x), int(intersection[0].y)]
+  img = cv2.circle(img, (int(intersection[0].x), int(intersection[0].y)), 7, [0, 255, 255], 5)
 
-    # Change corners of contour
-    for i in range(len(corners)):
-      if i != point1 and i != point1_next and i != point2 and i != point2_next:
-        lastCorner = corners[i]
-    newCorners = np.array([[newCorner],[ corners[point1_next]], [lastCorner], [corners[point2_next]]])
-    
-    return newCorners
+  # Change corners of contour
+  for i in range(len(corners)):
+    if i != point1 and i != point1_next and i != point2 and i != point2_next:
+      lastCorner = corners[i]
+  newCorners = np.array([[newCorner],[ corners[point1_next]], [lastCorner], [corners[point2_next]]])
+  
+  return newCorners
+
+def CheckPositionOfExtraxt(points, imgShape, border):
+  result = True
+  for point in points:
+    if point[0, 0] < border or point[0, 0] > imgShape[1] - border or point[0, 1] < border or point[0, 1] > imgShape[0] - border:
+      result = False
+  return result
 
 
 
@@ -255,16 +262,23 @@ def FindPainting(img):
         if CheckContourRatio(newContour, threshold_ratio) and CheckParallelogram(newContour, threshold_diffAngle) and CheckCornerAngels(newContour, threshold_lowerAngle, threshold_upperAngle):
           quadrilateral_list.append(newContour)
 
-  # Draw quadrilateral
+  # Filter out bad extraxts and raw quadrilateral
+  threshold_border = 5
   imgContour = img.copy()
-  cv2.drawContours(imgContour, quadrilateral_list, -1, (0, 255, 0), 5)
+  goodContours = []
+  for quadrilateral in quadrilateral_list:
+    if CheckPositionOfExtraxt(quadrilateral, img.shape, threshold_border):
+      cv2.drawContours(imgContour, [quadrilateral], -1, (0, 255, 0), 5)
+      goodContours.append(quadrilateral)
+    else:
+      cv2.drawContours(imgContour, [quadrilateral], -1, (0, 0, 255), 5)
 
   # Extract painting
   extraxtList = []
-  for quadrilateral in quadrilateral_list:
+  for goodContour in goodContours:
     x = []
     y = []
-    for corner in quadrilateral:
+    for corner in goodContour:
       x.append(corner[0, 0])
       y.append(corner[0, 1])
     extraxt = img.copy()

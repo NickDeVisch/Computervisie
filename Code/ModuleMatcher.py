@@ -126,6 +126,7 @@ class Matching:
     weightComRed = 0.05
     weightPatches = 0.25
 
+
     # Get info from painting
     sift = cv2.SIFT_create()
     key_point, descr = sift.detectAndCompute(img, None)
