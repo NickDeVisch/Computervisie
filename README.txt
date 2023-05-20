@@ -26,7 +26,7 @@ TODO
     - Room voor HSV filter
 
  - Paper
-    - Deel 4 afwerken (Arne)
+    - Deel 4 afwerken (Arne). Ondertussen ok denk ik? Eens nalezen?
     - Nalezen van paper + eventuele opmerkingen die Bram kan verwerken (iedereen)
     - Resultaten ass1 
     - Resultaten ass2
