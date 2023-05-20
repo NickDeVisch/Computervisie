@@ -55,10 +55,10 @@ if __name__ == '__main__':
             if goodMatch:
                 # Get best match and add to room sequence
                 matchResult = goodMatches[goodMatches['flannAmount'] == goodMatches['flannAmount'].max()]
-                #freq=Counter(matchResult['naam'])
-                #most_freq, _ = freq.most_common(1)[0]
-                #matching.AppendRoom(most_freq.split('__')[0])
-                matching.AppendRoom(matchResult['naam'].values[0].split('__')[0])
+                #freq=Counter(matchResult['naam'])              #Code Louis
+                #most_freq, _ = freq.most_common(1)[0]          #Code Louis
+                #matching.AppendRoom(most_freq.split('__')[0])  #Code Louis
+                matching.AppendRoom(matchResult['naam'].values[0].split('__')[0]) #Code Louis (deze lijn mag weg als dit nieuw systeem werkt)
 
                 # Get matching painting from database and print name in it
                 matchPainting = cv2.imread(url + '\\Database\\' + matchResult['naam'].values[0])
