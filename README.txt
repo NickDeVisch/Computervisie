@@ -18,12 +18,6 @@ TODO
     - Van alle gevonden paintings enkel de beste match gebruiken
     - Indien andere room zou zijn, de x aantal volgende frames checken of dit wel zo is, indien zo dan pas room tovoegen
 
-- Painting detector v2
-    - Parameters verbeteren => Nick
-    - Rand filter verbeteren => Nick (Mss oppervlakte er bij betrekken)
-    - Kader in kader filteren
-    - Room voor HSV filter
-
  - Paper
     - Deel 4 afwerken (Arne). Ondertussen ok denk ik? Eens nalezen?
     - Nalezen van paper + eventuele opmerkingen die Bram kan verwerken (iedereen)

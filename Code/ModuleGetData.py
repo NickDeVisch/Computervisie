@@ -83,15 +83,15 @@ class GetDataFromDrive:
 
   def __CreateKeyAndDesc(self):
     if self.debug: print('Creating files...')
-    sift = cv2.SIFT_create()
+    sift = cv2.SIFT_create(500)
 
     for i, painting in enumerate(os.listdir(self.url + '\\Database')):
       if self.debug: print(i)
 
       img = cv2.imread(self.url + '\\Database' + "\\"  + painting)
-      img = cv2.resize(img, [int(img.shape[1] * 25 / 100), int(img.shape[0] * 25 / 100)])
+      img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-      key_point, descr = sift.detectAndCompute(img,None)
+      key_point, descr = sift.detectAndCompute(img_gray, None)
       self.keypoints[painting] = [(kp.pt[0], kp.pt[1]) for kp in key_point]
       self.descriptors[painting] = descr
 

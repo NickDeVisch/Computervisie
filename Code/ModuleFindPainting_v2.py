@@ -2,15 +2,15 @@ import cv2
 import math
 import numpy as np
 import pandas as pd
-from sympy import Point, Line
+from sympy import Point, Line, Polygon
 
-RoomColorMask = {
-    'Zaal': ['Zaal 1', 'Zaal 2', 'Zaal 5', 'Zaal 6', 'Zaal 7', 'Zaal 8', 
-             'Zaal 9', 'Zaal 10', 'Zaal 11', 'Zaal 12', 'Zaal 13', 'Zaal 14', 
-             'Zaal 15', 'Zaal 16', 'Zaal 17', 'Zaal 18','Zaal 19', 'Zaal A', 'Zaal B', 
-             'Zaal C', 'Zaal D', 'Zaal E', 'Zaal F', 'Zaal G', 'Zaal H',  
-             'Zaal I', 'Zaal II', 'Zaal J', 'Zaal K', 'Zaal L', 'Zaal M', 
-             'Zaal N', 'Zaal O', 'Zaal P', 'Zaal Q', 'Zaal R', 'Zaal S', 'Zaal V' ],
+roomColorMask = {
+    'Zaal': ['zaal_1', 'zaal_2', 'zaal_5', 'zaal_6', 'zaal_7', 'zaal_8', 
+             'zaal_9', 'zaal_10', 'zaal_11', 'zaal_12', 'zaal_13', 'zaal_14', 
+             'zaal_15', 'zaal_16', 'zaal_17', 'zaal_18','zaal_19', 'zaal_A', 'zaal_B', 
+             'zaal_C', 'zaal_D', 'zaal_E', 'zaal_F', 'zaal_G', 'zaal_H',  
+             'zaal_I', 'zaal_II', 'zaal_J', 'zaal_K', 'zaal_L', 'zaal_M', 
+             'zaal_N', 'zaal_O', 'zaal_P', 'zaal_Q', 'zaal_R', 'zaal_S', 'zaal_V' ],
     'Waarden': [
         [0, 40, 80, 179, 255, 255], #zaal 1
         [0, 0, 0, 90, 255, 255],    #zaal 2
@@ -34,25 +34,25 @@ RoomColorMask = {
         [0, 0, 0, 180, 255, 255],   #zaal C
         [0, 0, 0, 180, 255, 255],   #zaal D
         [0, 0, 0, 180, 255, 255],   #zaal E
-        [0,0,0,55,255,255],         #zaal F
+        [0, 0, 0, 55, 255, 255],         #zaal F
         [0, 0, 0, 180, 255, 255],   #zaal G
         [0, 0, 0, 180, 255, 255],   #zaal H
-        [0,0,0,180,70,255],         #zaal I
-        [0,30,0,180,255,255],       #zaal II
-        [0,0,0,180,70,255],         #zaal J
-        [0,0,0,180,70,255],         #zaal K
+        [0, 0, 0, 180, 70, 255],         #zaal I
+        [0, 30, 0, 180, 255, 255],       #zaal II
+        [0, 0, 0, 180, 70, 255],         #zaal J
+        [0, 0, 0, 180, 70, 255],         #zaal K
         [0, 0, 0, 180, 70, 255],    #zaal L  
         [0, 0, 0, 180, 255, 255],   #zaal M
-        [0,0,0,180,130,255],        #zaal N
+        [0, 0, 0, 180, 130, 255],        #zaal N
         [0, 0, 0, 180, 255, 255],   #zaal O
         [0, 0, 0, 180, 255, 255],   #zaal P
         [0, 0, 0, 180, 255, 255],   #zaal Q
         [0, 0, 0, 180, 255, 255],   #zaal R
         [0, 0, 0, 180, 255, 255],   #zaal S
-        [0,0,100,180,255,255],      #zaal V
+        [0, 0, 100, 180, 255, 255],      #zaal V
     ]
 }
-df = pd.DataFrame(RoomColorMask)
+df = pd.DataFrame(roomColorMask)
 
 def ReplaceColorWithWhite(image, lower_color, upper_color):
     # Converteer de afbeelding naar het HSV-kleursysteem
@@ -155,11 +155,16 @@ def CheckParallelogram(points, diffThreshold):
     else:
        return False
 
-def FiveToFourCorners(points, img):
+def GetCornersFromContour(contour):
   # Get corners
   corners = []
-  for i in range(5):
-      corners.append(points[i, 0])
+  for i in range(len(contour)):
+    corners.append(contour[i, 0])
+  return corners
+
+def FiveToFourCorners(points, img):
+  # Get corners
+  corners = GetCornersFromContour(points)
 
   # Get points that form shortest line
   shortestDist = np.inf
@@ -172,8 +177,8 @@ def FiveToFourCorners(points, img):
           shortestDist = dist
           point1 = i
           point2 = j
-  img = cv2.circle(img, corners[point1], 7, [0, 0, 255], 5)
-  img = cv2.circle(img, corners[point2], 7, [255, 0, 0], 5)
+  #img = cv2.circle(img, corners[point1], 7, [0, 0, 255], 5)
+  #img = cv2.circle(img, corners[point2], 7, [255, 0, 0], 5)
 
   # Get next point in contour
   shortestDist1 = np.inf
@@ -210,8 +215,8 @@ def FiveToFourCorners(points, img):
           shortestDist1 = dist
           point1_next = i
     
-  img = cv2.circle(img, corners[point1_next], 7, [0, 0, 255], 5)
-  img = cv2.circle(img, corners[point2_next], 7, [255, 0, 0], 5)
+  #img = cv2.circle(img, corners[point1_next], 7, [0, 0, 255], 5)
+  #img = cv2.circle(img, corners[point2_next], 7, [255, 0, 0], 5)
 
   # Line 1
   p1 = Point(corners[point1])
@@ -228,7 +233,7 @@ def FiveToFourCorners(points, img):
   if intersection == []:
     return None
   newCorner = [int(intersection[0].x), int(intersection[0].y)]
-  img = cv2.circle(img, (int(intersection[0].x), int(intersection[0].y)), 7, [0, 255, 255], 5)
+  #img = cv2.circle(img, (int(intersection[0].x), int(intersection[0].y)), 7, [0, 255, 255], 5)
 
   # Change corners of contour
   for i in range(len(corners)):
@@ -242,14 +247,23 @@ def CheckPositionOfExtraxt(points, imgShape, border):
   result = True
   for point in points:
     if point[0, 0] < border or point[0, 0] > imgShape[1] - border or point[0, 1] < border or point[0, 1] > imgShape[0] - border:
-      result = False
+      if not CheckContourRatio(points, 1.5):
+        result = False
   return result
 
 def GetMaskRoom(zaal):
-  index = RoomColorMask['Zaal'].index(zaal)
-  return RoomColorMask['Waarden'][index]
+  return df[df['Zaal'] == zaal]['Waarden'].values[0]
 
-def ReplaceColorWithWhite(image, currentRoom):
+def ReplaceColorWithWhite(image, roomSequence):
+  # Check if first room is found
+  if roomSequence == []:
+    return image
+
+  # Check if current room is in list
+  if roomSequence[-1] not in df['Zaal'].values:
+    return image
+  currentRoom = roomSequence[-1]
+
   # Converteer de afbeelding naar het HSV-kleursysteem
   resize_image = cv2.resize(image, (int(image.shape[1] * 10 / 100), int(image.shape[0] * 10 / 100)), cv2.INTER_AREA)
   hsv_image = cv2.cvtColor(resize_image, cv2.COLOR_BGR2HSV)
@@ -271,14 +285,24 @@ def ReplaceColorWithWhite(image, currentRoom):
   
   return image_copy
 
+def CheckContourInContour(points, rectangles): # Wordt niet gebruikt, te veel lag
+  # Get corners
+  contour = Polygon(*GetCornersFromContour(points))
+
+  for rectangle in rectangles:
+    polygon = Polygon(*GetCornersFromContour(rectangle))
+    if polygon.encloses(contour):
+      return False
+  return True
 
 
-def FindPainting(img, currentRoom):
+
+def FindPainting(img, roomSequence):
   # Filter background
-  #img_copy = ReplaceColorWithWhite(img, currentRoom)
+  img_copy = ReplaceColorWithWhite(img, roomSequence)
 
   # Covert to gray
-  img_gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
+  img_gray = cv2.cvtColor(img_copy, cv2.COLOR_RGB2GRAY)
 
   # Bilateral filter
   size = 7
@@ -327,8 +351,8 @@ def FindPainting(img, currentRoom):
 
   # Fit quadrilateral
   threshold_ratio = 3
-  threshold_lowerAngle = 80
-  threshold_upperAngle = 100
+  threshold_lowerAngle = 83
+  threshold_upperAngle = 97
   threshold_diffAngle = 10
 
   quadrilateral_list = []

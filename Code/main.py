@@ -1,9 +1,14 @@
 import os
 import cv2
 import time
+import warnings
 import collections
 import numpy as np
 import pandas as pd
+
+np.seterr(invalid ='ignore')
+np.seterr(over ='ignore')
+warnings.filterwarnings("ignore", category=UserWarning)
 
 from ModuleGetData import GetDataFromDrive
 from ModuleFindPainting_v2 import FindPainting, ReplaceColorWithWhite
@@ -25,8 +30,9 @@ if __name__ == '__main__':
     distCoeffs = np.array([[-0.26972165, 0.11073541, 0.00049764, -0.00060387, -0.02801339]])
 
     # Load video
-    videoUrl =  url + '\\Videos\\GoPro\\MSK_16.mp4'
+    videoUrl =  url + '\\Videos\\GoPro\\MSK_17.mp4'
     video = cv2.VideoCapture(videoUrl)
+    fps = video.get(cv2.CAP_PROP_FPS)
 
     goodMatch = False
     for i in range(int(video.get(cv2.CAP_PROP_FRAME_COUNT))):
@@ -37,14 +43,12 @@ if __name__ == '__main__':
         if goodMatch:
             if i%180 == 0: 
                 goodMatch = False
-        if not goodMatch:
-            if i%5 != 0: continue
-
-        #print('Frame', i)
-        frame, extraxtList = FindPainting(frame, 'Zaal 5')
-        if goodMatch == False and False:
+        
+        frame, extraxtList = FindPainting(frame, matching.roomSequence)
+        if goodMatch == False:
             goodMatches = pd.DataFrame()
             for extraxt in extraxtList:
+                if extraxt is None or extraxt.size == 0: break
                 matchResult = matching.MatchPainting(extraxt)
                 flannAmount_1 = matchResult[:1]['flannAmount'].values[0]
                 flannAmount_2 = matchResult[1:2]['flannAmount'].values[0]
@@ -64,9 +68,8 @@ if __name__ == '__main__':
                 matching.AppendRoom(matchResult['naam'].values[0].split('__')[0]) 
 
                 # Get matching painting from database and print name in it
-                matchPainting = cv2.imread(url + '\\Database\\' + matchResult['naam'].values[0])
-                matchPainting = cv2.putText(matchPainting, matchResult['naam'].values[0], (50, 125), cv2.FONT_HERSHEY_SIMPLEX, 3, (0, 255, 0), 10, cv2.LINE_AA, False)
-                matchPainting = ResizeImage(matchPainting)
+                matchPainting = ResizeImage(cv2.imread(url + '\\Database\\' + matchResult['naam'].values[0]))
+                matchPainting = cv2.putText(matchPainting, matchResult['naam'].values[0], (5, 25), cv2.FONT_HERSHEY_DUPLEX, 0.5, (0, 255, 0), 1, cv2.LINE_AA, False)
 
                 # Update floorplan
                 floorplan = floorPlan.DrawPath(matching.roomSequence)

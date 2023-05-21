@@ -128,7 +128,8 @@ class Matching:
 
 
     # Get info from painting
-    sift = cv2.SIFT_create()
+    sift = cv2.SIFT_create(500)
+    #img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     key_point, descr = sift.detectAndCompute(img, None)
     hist = ColorHist(img)
     cX, cY = ComRed(img)
@@ -212,3 +213,4 @@ class Matching:
     else: 
       if self.roomSequence[-1] != room: 
         self.roomSequence.append(room)
+        print('Added room to sequence: ', room)
