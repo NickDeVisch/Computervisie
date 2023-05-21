@@ -172,8 +172,8 @@ def FiveToFourCorners(points, img):
           shortestDist = dist
           point1 = i
           point2 = j
-  #img = cv2.circle(img, corners[point1], 7, [0, 0, 255], 5)
-  #img = cv2.circle(img, corners[point2], 7, [255, 0, 0], 5)
+  img = cv2.circle(img, corners[point1], 7, [0, 0, 255], 5)
+  img = cv2.circle(img, corners[point2], 7, [255, 0, 0], 5)
 
   # Get next point in contour
   shortestDist1 = np.inf
@@ -210,8 +210,8 @@ def FiveToFourCorners(points, img):
           shortestDist1 = dist
           point1_next = i
     
-  #img = cv2.circle(img, corners[point1_next], 7, [0, 0, 255], 5)
-  #img = cv2.circle(img, corners[point2_next], 7, [255, 0, 0], 5)
+  img = cv2.circle(img, corners[point1_next], 7, [0, 0, 255], 5)
+  img = cv2.circle(img, corners[point2_next], 7, [255, 0, 0], 5)
 
   # Line 1
   p1 = Point(corners[point1])
@@ -225,8 +225,10 @@ def FiveToFourCorners(points, img):
 
   # Find intersection
   intersection = l1.intersection(l2)
+  if intersection == []:
+    return None
   newCorner = [int(intersection[0].x), int(intersection[0].y)]
-  #img = cv2.circle(img, (int(intersection[0].x), int(intersection[0].y)), 7, [0, 255, 255], 5)
+  img = cv2.circle(img, (int(intersection[0].x), int(intersection[0].y)), 7, [0, 255, 255], 5)
 
   # Change corners of contour
   for i in range(len(corners)):
@@ -273,10 +275,10 @@ def ReplaceColorWithWhite(image, currentRoom):
 
 def FindPainting(img, currentRoom):
   # Filter background
-  img_copy = ReplaceColorWithWhite(img, currentRoom)
+  #img_copy = ReplaceColorWithWhite(img, currentRoom)
 
   # Covert to gray
-  img_gray = cv2.cvtColor(img_copy, cv2.COLOR_RGB2GRAY)
+  img_gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
 
   # Bilateral filter
   size = 7

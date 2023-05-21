@@ -20,7 +20,6 @@ TODO
 
 - Painting detector v2
     - Parameters verbeteren => Nick
-    - Zandloper effect bij 5 punten bekijken => Nick
     - Rand filter verbeteren => Nick (Mss oppervlakte er bij betrekken)
     - Kader in kader filteren
     - Room voor HSV filter

@@ -25,7 +25,7 @@ if __name__ == '__main__':
     distCoeffs = np.array([[-0.26972165, 0.11073541, 0.00049764, -0.00060387, -0.02801339]])
 
     # Load video
-    videoUrl =  url + '\\Videos\\GoPro\\MSK_17.mp4'
+    videoUrl =  url + '\\Videos\\GoPro\\MSK_16.mp4'
     video = cv2.VideoCapture(videoUrl)
 
     goodMatch = False
@@ -42,7 +42,7 @@ if __name__ == '__main__':
 
         #print('Frame', i)
         frame, extraxtList = FindPainting(frame, 'Zaal 5')
-        if goodMatch == False:
+        if goodMatch == False and False:
             goodMatches = pd.DataFrame()
             for extraxt in extraxtList:
                 matchResult = matching.MatchPainting(extraxt)
