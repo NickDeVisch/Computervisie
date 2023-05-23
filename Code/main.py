@@ -15,7 +15,6 @@ from ModuleFindPainting_v2 import FindPainting, CheckCornersRelativeToPrevious
 from ModuleMatcher import Matching
 from ModuleFloorPlan import Floorplan
 from ModuleDisplayScreen import DisplayScreen, ResizeImage
-from test import create_chart_from_dataframe
 
 # Default url
 url = 'D:\\School\\UGent\\AUT 5\\Computervisie\\Computervisie'
