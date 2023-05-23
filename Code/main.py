@@ -18,10 +18,12 @@ from ModuleDisplayScreen import DisplayScreen, ResizeImage
 
 # Default url
 url = 'D:\\School\\UGent\\AUT 5\\Computervisie\\Computervisie'
+#url = 'D:\\1_School\\Ugent\\Masterjaar\\2_Computervisie\\Project'  #LOUIS
 
 if __name__ == '__main__':
     # Load video
     videoUrl =  url + '\\Videos\\GoPro\\MSK_17.mp4'
+    #videoUrl =  url + '\\Videos\\Smartphone\\MSK_05.mp4'   #LOUIS
     video = cv2.VideoCapture(videoUrl)
     
     # Init objects
