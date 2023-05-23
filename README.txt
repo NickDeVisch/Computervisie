@@ -1,8 +1,6 @@
 TODO
 - Grafiek voor detecties (Assignment 4 ofz)
 
-- Upkuisen van matrixen voor camera
-
 - Deelopdrachten
     - Assignment 1: Corner detectie (Wachten op parameter finetuning)
     - Assignment 2: database matchen tegen zichzelf en verschil tussen twee beste resultaten bijhouden => gemiddelde nemen hiervan
@@ -11,7 +9,7 @@ TODO
 
 - Matching verbeteren => Nick en Louis
     - Andere matcher dan knnMatcher proberen
-    - Gewogen som van ~20 returns nemen om zaal beter te bepalen
+    - Gewogen som van 20 returns nemen om zaal beter te bepalen
     - # Flann matches mee returnen om zo te bepalen of het een goeie match is
         - Totaal # matches vergelijken
         - Verhouding van # matches tov 2de beste match (kleiner verschil tov 2de bij slechte match)
@@ -24,3 +22,13 @@ TODO
     - Resultaten ass1 
     - Resultaten ass2
     - Volledig resultaat van bevindingen
+
+
+- Matcher
+    - First room overwrite
+    - Gewogen som van 20 returns nemen om zaal beter te bepalen
+    - Zelfde zaal => Geen speciale dingen
+    - Andere zaal
+        - x aantal keer herproberen en kijken ofdat zelfde is   
+            - 
+

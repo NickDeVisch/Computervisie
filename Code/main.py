@@ -2,83 +2,80 @@ import os
 import cv2
 import time
 import warnings
-import collections
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 
 np.seterr(invalid ='ignore')
 np.seterr(over ='ignore')
 warnings.filterwarnings("ignore", category=UserWarning)
 
 from ModuleGetData import GetDataFromDrive
-from ModuleFindPainting_v2 import FindPainting, ReplaceColorWithWhite
+from ModuleFindPainting_v2 import FindPainting, CheckCornersRelativeToPrevious
 from ModuleMatcher import Matching
 from ModuleFloorPlan import Floorplan
-from ModuleDisplayScreen import ResizeImage
+from ModuleDisplayScreen import DisplayScreen, ResizeImage
+from test import create_chart_from_dataframe
+
+# Default url
+url = 'D:\\School\\UGent\\AUT 5\\Computervisie\\Computervisie'
 
 if __name__ == '__main__':
-    url = 'D:\\School\\UGent\\AUT 5\\Computervisie\\Computervisie'
-
-    getDataFromDrive = GetDataFromDrive(url)
-    matching = Matching(getDataFromDrive.keypoints, getDataFromDrive.descriptors, getDataFromDrive.df, url)
-    floorPlan = Floorplan(url)
-
-    cameraMatrix = np.array([[582.02639453, 0., 647.52365408], [0., 586.04899393, 339.20774435],[0., 0., 1.]])
-    distCoeffs = np.array([[-2.42003542e-01,  7.01396093e-02, -8.30073220e-04, 9.71570940e-05, -1.02586096e-02]])
-    
-    cameraMatrix = np.array([[722.31231717, 0., 648.09282601], [0., 727.65628288, 323.11790409], [0., 0., 1.]])
-    distCoeffs = np.array([[-0.26972165, 0.11073541, 0.00049764, -0.00060387, -0.02801339]])
-
     # Load video
     videoUrl =  url + '\\Videos\\GoPro\\MSK_17.mp4'
     video = cv2.VideoCapture(videoUrl)
-    fps = video.get(cv2.CAP_PROP_FPS)
+    
+    # Init objects
+    getDataFromDrive = GetDataFromDrive(url)
+    matching = Matching(getDataFromDrive.keypoints, getDataFromDrive.descriptors, getDataFromDrive.df, url)
+    floorPlan = Floorplan(url)
+    displayScreen = DisplayScreen(videoUrl)
 
-    goodMatch = False
+    # Init variables
+    previousCorners = None
+
+    # Iterate over frames
     for i in range(int(video.get(cv2.CAP_PROP_FRAME_COUNT))):
-        # Get frame from video abd undistort it
+        # Get frame from video and undistort it
         ret, frame = video.read()
-        frame = cv2.undistort(frame, cameraMatrix, distCoeffs)
+        frame = displayScreen.UndistortFrame(frame)
 
-        if goodMatch:
-            if i%180 == 0: 
-                goodMatch = False
-        
-        frame, extraxtList = FindPainting(frame, matching.roomSequence)
-        if goodMatch == False:
-            goodMatches = pd.DataFrame()
+        # Detect paintings in frame
+        frame, extraxtList, corners = FindPainting(frame, matching.roomSequence)
+
+        # Check if any extraxts where found
+        if len(extraxtList) != 0:
+            # Match detected paintings from frame
+            matches = pd.DataFrame()
             for extraxt in extraxtList:
-                if extraxt is None or extraxt.size == 0: break
-                matchResult = matching.MatchPainting(extraxt)
-                flannAmount_1 = matchResult[:1]['flannAmount'].values[0]
-                flannAmount_2 = matchResult[1:2]['flannAmount'].values[0]
-                if (flannAmount_1 > 2.5 * flannAmount_2 and flannAmount_1 > 75) or flannAmount_1 > 150:
-                    goodMatch = True
-                    goodMatches = pd.concat([goodMatches, matchResult[:1]])
+                result = matching.MatchPainting(extraxt)
+                matches = pd.concat([matches, result[:1]])
             
-            if goodMatch:
-                # Get best match and add to room sequence
-                matchResult = goodMatches[goodMatches['flannAmount'] == goodMatches['flannAmount'].max()]
-                #tempRooms=collections.deque(["dummy1", "dummy2", "dummy3", "dummy4", "dummy5"])             #eerste werkelijke zaal zal naar buiten gebracht worden
-                #tempRooms.appendleft(matchResult['naam'].values[0].split('__')[0])
-                #tempRooms.pop
-                #freq=collections.Counter(tempRooms)
-                #mostFreq,_=freq.most_common(1)[0]
-                #matching.AppendRoom(mostFreq) #NIET ZEKER VAN DEZE IMPLEMENTATIE
-                matching.AppendRoom(matchResult['naam'].values[0].split('__')[0]) 
+            # Take best match
+            bestMatch = matches.sort_values(by=['total'], ascending=False)
+            
+            # Check if match is good enough
+            if bestMatch['total'].values[0] > 0.35:
+                # Add room to roomSequence
+                matching.AppendRoom(bestMatch['naam'].values[0].split('__')[0]) 
 
                 # Get matching painting from database and print name in it
-                matchPainting = ResizeImage(cv2.imread(url + '\\Database\\' + matchResult['naam'].values[0]))
-                matchPainting = cv2.putText(matchPainting, matchResult['naam'].values[0], (5, 25), cv2.FONT_HERSHEY_DUPLEX, 0.5, (0, 255, 0), 1, cv2.LINE_AA, False)
+                matchPainting = ResizeImage(cv2.imread(url + '\\Database\\' + bestMatch['naam'].values[0]))
+                matchPainting = cv2.putText(matchPainting, bestMatch['naam'].values[0], (5, 25), cv2.FONT_HERSHEY_DUPLEX, 0.5, (0, 255, 0), 1, cv2.LINE_AA, False)
 
                 # Update floorplan
                 floorplan = floorPlan.DrawPath(matching.roomSequence)
 
                 # Generate windows
                 cv2.imshow('Best match', matchPainting)
-                cv2.imshow('Extract', ResizeImage(extraxt))
                 cv2.imshow('Floorplan', floorplan)
 
+        # Save last corners
+        previousCorners = corners
+
+        # Show frame with contours
         cv2.imshow('Video', ResizeImage(frame))
         cv2.waitKey(1)
+
+    # Destroy all windows when video ends
     cv2.destroyAllWindows()   

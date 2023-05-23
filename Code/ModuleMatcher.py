@@ -21,6 +21,7 @@ class Matching:
 
   lastMatches = []
   roomSequence = []
+  roomBuffer = []
 
   connectedRooms = {
     'zaal_A': ['zaal_B','zaal_II'],
@@ -159,7 +160,7 @@ class Matching:
     for index, row in df_result.iterrows():
       resultFlann.append(self.__FlannMatching(self.descriptors[df_result['naam'][index]], descr))
     df_result['flannAmount'] = resultFlann
-    maxFlann = max(resultFlann)
+    maxFlann = 500
     df_result['flann'] = [float(i/maxFlann) for i in resultFlann]
     del resultFlann
 
@@ -192,10 +193,14 @@ class Matching:
     df_result = pd.merge(df_result, df_temp, on='naam')
     del dic, df_temp
 
-    # Make combined classification
+    # Make combined classification and take 20 best
     df_result['total'] = df_result['flann'] * weightFlann + df_result['hist'] * weightHist + df_result['comred'] * weightComRed + df_result['patches'] * weightPatches
-    print(df_result.sort_values(by=['total'], ascending=False)[:5]) #REMOVE
-    df_result = df_result.sort_values(by=['total'], ascending=False)[:20] #DEZE WAARDE VERANDERT VAN 5 naar 20
+    #print(df_result.sort_values(by=['total'], ascending=False)[:5]) #REMOVE
+    df_result = df_result.sort_values(by=['total'], ascending=False)[:20]
+    df_result = df_result.reset_index()
+
+    # Add room name
+    df_result['zaal'] = df_result['naam'].apply(lambda x: x.split('__')[0])
 
     return df_result
   
