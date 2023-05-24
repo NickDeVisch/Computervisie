@@ -16,14 +16,15 @@ class DisplayScreen:
     cameraMatrix = None
     distCoeffs = None
 
-    def __init__(self, videoUrl):   
-        videoNumber = int(videoUrl.split('\\')[-1].split('.')[0].split('_')[1])
-        if videoNumber == 12 or videoNumber == 18 or videoNumber == 19:
-            self.cameraMatrix = self.cameraMatrix_M
-            self.distCoeffs = self.distCoeffs_M
-        else:
-            self.cameraMatrix = self.cameraMatrix_W
-            self.distCoeffs = self.distCoeffs_W
+    def __init__(self, videoUrl):
+        if videoUrl.split('\\')[-2] == 'GoPro':
+            videoNumber = int(videoUrl.split('\\')[-1].split('.')[0].split('_')[1])
+            if videoNumber == 12 or videoNumber == 18 or videoNumber == 19:
+                self.cameraMatrix = self.cameraMatrix_M
+                self.distCoeffs = self.distCoeffs_M
+            else:
+                self.cameraMatrix = self.cameraMatrix_W
+                self.distCoeffs = self.distCoeffs_W
 
     def UndistortFrame(self, frame):
         if self.cameraMatrix is None and self.distCoeffs is None:
