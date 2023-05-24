@@ -34,6 +34,7 @@ if __name__ == '__main__':
 
     # Init variables
     previousCorners = None
+    goodMatch = False
 
     # Iterate over frames
     for i in range(int(video.get(cv2.CAP_PROP_FRAME_COUNT))):
@@ -44,8 +45,13 @@ if __name__ == '__main__':
         # Detect paintings in frame
         frame, extraxtList, corners = FindPainting(frame, matching.roomSequence)
 
+        # Skip matching for frames
+        if goodMatch:
+            if i%180 == 0:
+                goodMatch = False
+
         # Check if any extraxts where found
-        if len(extraxtList) != 0:
+        if len(extraxtList) != 0 and not goodMatch:
             # Match detected paintings from frame
             matches = pd.DataFrame()
             for extraxt in extraxtList:
@@ -57,6 +63,8 @@ if __name__ == '__main__':
             
             # Check if match is good enough
             if bestMatch['total'].values[0] > 0.35:
+                goodMatch = True
+
                 # Add room to roomSequence
                 matching.AppendRoom(bestMatch['naam'].values[0].split('__')[0]) 
 

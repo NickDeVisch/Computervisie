@@ -206,10 +206,12 @@ class Matching:
   
 
   def AppendRoom(self, room):
-    # Append to list
+    # Lower first letter
     room = room[0].lower() + room[1:]
     
-    if len(self.lastMatches) == 20: #DEZE WAARDE VERANDERT VAN 5 NAAR 20
+    
+
+    if len(self.lastMatches) == 20:
         self.lastMatches.pop(0)
     self.lastMatches.append(room)
 
