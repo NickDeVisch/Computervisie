@@ -17,7 +17,7 @@ from ModuleDisplayScreen import DisplayScreen, ResizeImage
 
 # Default url
 url = 'D:\\1_School\\Ugent\\Masterjaar\\2_Computervisie\\Project\\Database'
-#url = 'D:\\1_School\\Ugent\\Masterjaar\\2_Computervisie\\Project'  #LOUIS
+#url = 'D:\\1_School\\Ugent\\Masterjaar\\2_Computervisie\\Project'  #LOUIS  
 print("dit is de url:" ,url)
 
 
