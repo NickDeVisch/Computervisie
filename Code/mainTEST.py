@@ -16,11 +16,7 @@ from ModuleFloorPlan import Floorplan
 from ModuleDisplayScreen import DisplayScreen, ResizeImage
 
 # Default url
-url = 'D:\\1_School\\Ugent\\Masterjaar\\2_Computervisie\\Project\\Database'
-#url = 'D:\\1_School\\Ugent\\Masterjaar\\2_Computervisie\\Project'  #LOUIS  
-print("dit is de url:" ,url)
-
-
+url = 'D:\\1_School\\Ugent\\Masterjaar\\2_Computervisie\\Project'  #LOUIS  
 
 # Init objects
 getDataFromDrive = GetDataFromDrive(url)
@@ -31,7 +27,10 @@ previousCorners = None
 goodMatch = False
 
 def diff_second(i,path):
+  j=0
   count=0
+  input_name=[]
+  matching_name=[]
   near_second=[]
   matching_score=[]
 
@@ -40,21 +39,29 @@ def diff_second(i,path):
       count += 1
       if (count==i):
         count=0
-        print(path+"/"+file)  #image die getest wordt 
+        value_input_name=file
+        input_name.append(value_input_name)
+        print(file)  #image die getest wordt 
         img = cv2.imread(path+"/"+file)
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        img=ResizeImage(img)
         df_test=matching.MatchPainting(img) 
         df_test = df_test.reset_index()
         del df_test['index']
-        value_img_score= df_test.iat[0,5]
+        value_matching_name=df_test.iat[0,1]
+        matching_name.append(value_matching_name)
+        value_img_score= df_test.iat[0,7]
         matching_score.append(value_img_score)
-        value_near_second= df_test.iat[0,5]-df_test.iat[1,5]
+        value_near_second= df_test.iat[0,7]-df_test.iat[1,7]
         near_second.append(value_near_second)
         print("iteratie: ",j)
         j=j+1
+        print(matching_name)
         print(near_second)
         print(matching_score)
 
-  return matching_score,near_second  
+  return matching_name,matching_score,near_second  
+url = 'D:\\1_School\\Ugent\\Masterjaar\\2_Computervisie\\Project\\Database'
+#diff_second(1,url)
 
-diff_second(400,url)
+
