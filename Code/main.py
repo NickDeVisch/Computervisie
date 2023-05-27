@@ -14,7 +14,7 @@ from ModuleGetData import GetDataFromDrive
 from ModuleFindPainting_v2 import FindPainting, CheckCornersRelativeToPrevious
 from ModuleMatcher import Matching
 from ModuleFloorPlan import Floorplan
-from ModuleDisplayScreen import DisplayScreen, ResizeImage
+from ModuleDisplayScreen import DisplayScreen, ResizeImage, CheckSharpnessOfImage
 
 # Default url
 url = 'D:\\School\\UGent\\AUT 5\\Computervisie\\Computervisie'
@@ -22,8 +22,8 @@ url = 'D:\\School\\UGent\\AUT 5\\Computervisie\\Computervisie'
 
 if __name__ == '__main__':
     # Load video
-    videoUrl =  url + '\\Videos\\GoPro\\MSK_17.mp4'
-    #videoUrl =  url + '\\Videos\\Smartphone\\MSK_05.mp4'   #LOUIS
+    videoUrl =  url + '\\Videos\\GoPro\\MSK_16.mp4'
+    #videoUrl =  url + '\\Videos\\Smartphone\\MSK_02.mp4'   #LOUIS
     video = cv2.VideoCapture(videoUrl)
     
     # Init objects
@@ -43,7 +43,7 @@ if __name__ == '__main__':
         frame = displayScreen.UndistortFrame(frame)
 
         # Detect paintings in frame
-        frame, extraxtList, corners = FindPainting(frame, matching.roomSequence)
+        frame, extraxtList, corners = FindPainting(frame, matching.lastMatches)
 
         # Skip matching for frames
         if goodMatch:
@@ -51,33 +51,41 @@ if __name__ == '__main__':
                 goodMatch = False
 
         # Check if any extraxts where found
-        if len(extraxtList) != 0 and not goodMatch:
+        if len(extraxtList) != 0 and not goodMatch and i%5 == 0:
             # Match detected paintings from frame
             matches = pd.DataFrame()
             for extraxt in extraxtList:
+                # Check extraxt on sharpness
+                if extraxt.size == 0: continue
+                if not CheckSharpnessOfImage(extraxt, 50.0): continue
+                
+                # Match extraxt
                 result = matching.MatchPainting(extraxt)
                 matches = pd.concat([matches, result[:1]])
             
-            # Take best match
-            bestMatch = matches.sort_values(by=['total'], ascending=False)
-            
-            # Check if match is good enough
-            if bestMatch['total'].values[0] > 0.35:
-                goodMatch = True
+            # Check if match has been found
+            if len(matches) > 0:
+                # Take best match
+                bestMatch = matches.sort_values(by=['total'], ascending=False).reset_index()
+                print(bestMatch)
 
-                # Add room to roomSequence
-                matching.AppendRoom(bestMatch['naam'].values[0].split('__')[0]) 
+                # Check if match is good enough
+                if bestMatch['total'].values[0] > 0.45:
+                    # Add room to roomSequence if it is a good room
+                    goodMatch = matching.AppendRoom(bestMatch['naam'].values[0].split('__')[0]) 
 
-                # Get matching painting from database and print name in it
-                matchPainting = ResizeImage(cv2.imread(url + '\\Database\\' + bestMatch['naam'].values[0]))
-                matchPainting = cv2.putText(matchPainting, bestMatch['naam'].values[0], (5, 25), cv2.FONT_HERSHEY_DUPLEX, 0.5, (0, 255, 0), 1, cv2.LINE_AA, False)
+                    # Get matching painting from database and print name in it
+                    matchPainting = ResizeImage(cv2.imread(url + '\\Database\\' + bestMatch['naam'].values[0]))
+                    matchPainting = cv2.putText(matchPainting, 'Score: ' + str(round(bestMatch['total'].values[0], 5)), (5, 50), cv2.FONT_HERSHEY_DUPLEX, 0.5, (0, 255, 0), 1, cv2.LINE_AA, False)
+                    if goodMatch: matchPainting = cv2.putText(matchPainting, bestMatch['naam'].values[0], (5, 25), cv2.FONT_HERSHEY_DUPLEX, 0.5, (0, 255, 0), 1, cv2.LINE_AA, False)
+                    else: matchPainting = cv2.putText(matchPainting, bestMatch['naam'].values[0], (5, 25), cv2.FONT_HERSHEY_DUPLEX, 0.5, (0, 0, 255), 1, cv2.LINE_AA, False)
 
-                # Update floorplan
-                floorplan = floorPlan.DrawPath(matching.roomSequence)
+                    # Update floorplan
+                    floorplan = floorPlan.DrawPath(matching.roomSequence)
 
-                # Generate windows
-                cv2.imshow('Best match', matchPainting)
-                cv2.imshow('Floorplan', floorplan)
+                    # Generate windows
+                    cv2.imshow('Best match', matchPainting)
+                    cv2.imshow('Floorplan', floorplan)
 
         # Save last corners
         previousCorners = corners
@@ -87,4 +95,6 @@ if __name__ == '__main__':
         cv2.waitKey(1)
 
     # Destroy all windows when video ends
+    print('Video done!')
+    cv2.waitKey(0)
     cv2.destroyAllWindows()   

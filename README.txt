@@ -2,7 +2,6 @@ TODO
 - Grafiek voor detecties (Assignment 4 ofz)
 
 - Deelopdrachten
-    - Assignment 1: Corner detectie (Wachten op parameter finetuning)
     - Assignment 2: database matchen tegen zichzelf en verschil tussen twee beste resultaten bijhouden => gemiddelde nemen hiervan
     - Assignment 2: database matchen met beelden van video en verschil tussen twee beste resultaten bijhouden => gemiddelde nemen hiervan
         Hiervoor eerst alle beelden door functie van assignemnt 1 laten lopen
@@ -18,8 +17,6 @@ TODO
 
  - Paper
     - Deel 4 afwerken (Arne). Ondertussen ok denk ik? Eens nalezen?
-    - Nalezen van paper + eventuele opmerkingen die Bram kan verwerken (iedereen)
-    - Resultaten ass1 
     - Resultaten ass2
     - Volledig resultaat van bevindingen
 

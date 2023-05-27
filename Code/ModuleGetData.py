@@ -1,7 +1,10 @@
 import os
 import cv2
 import pickle
+import numpy as np
 import pandas as pd
+
+from ModuleDisplayScreen import ResizeImage
 
 from ModuleFeatureVector import ColorHist
 from ModuleFeatureVector import ComRed
@@ -49,7 +52,7 @@ class GetDataFromDrive:
       if self.debug: print(i)
 
       img = cv2.imread(self.url + '\\Database' + '\\' + name)
-      img = cv2.resize(img, [int(img.shape[1] * 25 / 100), int(img.shape[0] * 25 / 100)])
+      img = ResizeImage(img, 1800)
 
       namen.append(name)
       
@@ -83,15 +86,19 @@ class GetDataFromDrive:
 
   def __CreateKeyAndDesc(self):
     if self.debug: print('Creating files...')
-    sift = cv2.SIFT_create(500)
 
     for i, painting in enumerate(os.listdir(self.url + '\\Database')):
       if self.debug: print(i)
 
       img = cv2.imread(self.url + '\\Database' + "\\"  + painting)
-      img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+      img_copy = cv2.resize(img, (int(img.shape[1]/4), int(img.shape[0]/4)))
+      img_copy = cv2.cvtColor(img_copy, cv2.COLOR_BGR2GRAY)
+      img_copy = cv2.GaussianBlur(img_copy, (3, 3), 0)
 
-      key_point, descr = sift.detectAndCompute(img_gray, None)
+      sift = cv2.SIFT_create(nfeatures=500, nOctaveLayers=6, contrastThreshold=0.04, edgeThreshold=35, sigma=2.2)
+      key_point, descr = sift.detectAndCompute(img_copy, None)
+      descr = descr.astype(np.float32)
+      
       self.keypoints[painting] = [(kp.pt[0], kp.pt[1]) for kp in key_point]
       self.descriptors[painting] = descr
 

@@ -14,14 +14,13 @@ class Matching:
   keypoints = {}
   descriptors = {}
 
-  flann = cv2.FlannBasedMatcher(dict(algorithm=5, trees=1), dict(checks=100))
+  flann = cv2.FlannBasedMatcher(dict(algorithm=0, trees=5), dict(checks=50))
 
   neighComRed = KNeighborsClassifier(n_neighbors=5, weights='distance', algorithm='auto')
   neighColorPatch = KNeighborsClassifier(n_neighbors=5, weights='distance', algorithm='auto')
 
   lastMatches = []
   roomSequence = []
-  roomBuffer = []
 
   connectedRooms = {
     'zaal_A': ['zaal_B','zaal_II'],
@@ -102,8 +101,13 @@ class Matching:
 
 
   def __FlannMatching(self, descr1, descr2):
-    matches = self.flann.knnMatch(descr1, descr2, k=2)
-    matchesMask = [[0,0] for i in range(len(matches))]
+    if descr1 is None or descr2 is None: return 0
+
+    try:
+      matches = self.flann.knnMatch(descr1, descr2, k=2)
+      matchesMask = [[0,0] for i in range(len(matches))]
+    except cv2.error as e:
+      return 0
 
     # ratio test.
     good = 0
@@ -122,16 +126,16 @@ class Matching:
 
   def MatchPainting(self, img):
     # Weights of classifiers
-    weightFlann = 0.65
-    weightHist = 0.15
+    weightFlann = 2
+    weightHist = 0.1
     weightComRed = 0.05
     weightPatches = 0.25
 
 
     # Get info from painting
-    sift = cv2.SIFT_create(500)
-    #img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    key_point, descr = sift.detectAndCompute(img, None)
+    sift = cv2.SIFT_create()
+    img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    key_point, descr = sift.detectAndCompute(img_gray, None)
     hist = ColorHist(img)
     cX, cY = ComRed(img)
     patch = ColorPatches(img)
@@ -195,7 +199,7 @@ class Matching:
 
     # Make combined classification and take 20 best
     df_result['total'] = df_result['flann'] * weightFlann + df_result['hist'] * weightHist + df_result['comred'] * weightComRed + df_result['patches'] * weightPatches
-    #print(df_result.sort_values(by=['total'], ascending=False)[:5]) #REMOVE
+    #print(df_result.sort_values(by=['total'], ascending=False)[:3]) #REMOVE
     df_result = df_result.sort_values(by=['total'], ascending=False)[:20]
     df_result = df_result.reset_index()
 
@@ -205,19 +209,51 @@ class Matching:
     return df_result
   
 
-  def AppendRoom(self, room):
+
+  def __CheckRoomOccerenceSequence(self, guessedRoom, threshold):
+    count = 0
+    for room in self.lastMatches:
+      if room == guessedRoom:
+        count += 1
+      else: count = 0
+    
+    if count >= threshold:
+      return True
+    else:
+      return False
+
+  def AppendRoom(self, room, debug=False):
     # Lower first letter
     room = room[0].lower() + room[1:]
-    
-    
 
-    if len(self.lastMatches) == 20:
-        self.lastMatches.pop(0)
+    # Get current room
+    if len(self.roomSequence) > 0:
+      currentRoom = self.roomSequence[-1]
+    else: currentRoom = None
+
+    # Add room to buffer
+    if len(self.lastMatches) == 5:
+      self.lastMatches.pop(0)
     self.lastMatches.append(room)
 
-    if len(self.roomSequence) == 0: 
+    # First room
+    if currentRoom == None:
       self.roomSequence.append(room)
-    else: 
-      if self.roomSequence[-1] != room: 
+      return True
+
+    # Check if discoverd room changed
+    if room != currentRoom:
+      if debug: print('Other room')
+
+      # Check buffer if room is good match
+      if len(self.lastMatches) == 5 and self.__CheckRoomOccerenceSequence(room, 4):
         self.roomSequence.append(room)
-        print('Added room to sequence: ', room)
+        return True
+      else:
+        return False
+
+    else: 
+      if debug: print('Room did not change')
+      return True
+
+    

@@ -57,6 +57,8 @@ class Floorplan:
     def DrawPath(self, roomSequence):
         img = cv2.imread(self.url)
         
+        if len(roomSequence) == 0: return ResizeImage(img)
+
         previousRoom = ''
         for room in roomSequence:
             img = cv2.circle(img, self.roomsCoord[room], 10, [255, 0, 0], 10)

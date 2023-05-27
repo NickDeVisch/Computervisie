@@ -107,6 +107,8 @@ def CalculateAngle(point1, point2, point3):
 
     # Bereken de cosinus van de hoek
     cosine_angle = dot_product / (norm_vector1 * norm_vector2)
+    if cosine_angle < -1.0: cosine_angle = -1.0
+    if cosine_angle > 1.0: cosine_angle = 1.0
 
     # Bereken de hoek in radialen en converteer naar graden
     angle_rad = math.acos(cosine_angle)
@@ -367,12 +369,12 @@ def FindPainting(img, roomSequence):
           if CheckContourRatio(newContour, threshold_ratio) and CheckParallelogram(newContour, threshold_diffAngle) and CheckCornerAngels(newContour, threshold_lowerAngle, threshold_upperAngle):
             quadrilateral_list.append(newContour)
 
-    # Filter out bad extraxts and raw quadrilateral
+    # Filter out bad extraxts and raw quadrilateral => Wordt niet meer gebruikt
     threshold_border = 5
     imgContour = img.copy()
     goodContours = []
     for quadrilateral in quadrilateral_list:
-      if CheckPositionOfExtraxt(quadrilateral, img.shape, threshold_border):
+      if CheckPositionOfExtraxt(quadrilateral, img.shape, threshold_border) or True:
         cv2.drawContours(imgContour, [quadrilateral], -1, (0, 255, 0), 5)
         goodContours.append(quadrilateral)
       else:

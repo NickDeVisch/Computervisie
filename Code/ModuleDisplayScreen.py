@@ -2,8 +2,25 @@ import os
 import cv2
 import numpy as np
 
-def ResizeImage(img):
-    return cv2.resize(img, [int(img.shape[1] / img.shape[0] * 400), 400], cv2.INTER_AREA)
+def ResizeImage(img, size=400):
+    return cv2.resize(img, [int(img.shape[1] / img.shape[0] * size), size], cv2.INTER_AREA)
+
+
+def CheckSharpnessOfImage(img, threshold, debug=False):
+    # Laad de afbeelding in grijswaarden
+    img_copy = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    
+    # Bereken de Laplacian-variëntie
+    laplacian_variatie = cv2.Laplacian(img_copy, cv2.CV_64F).var()
+    
+    # Print Laplacian-variëntie
+    if debug: print(laplacian_variatie)
+    
+    # Return True als variatie hoger is dan threshold
+    if laplacian_variatie > threshold:
+        return True
+    else:
+        return False
 
 
 class DisplayScreen:
