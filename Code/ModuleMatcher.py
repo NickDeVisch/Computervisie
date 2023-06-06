@@ -72,15 +72,15 @@ class Matching:
     self.debug = debug
     self.url = url + '\\Database'
 
-    # Keypoints
+    # Load keypoints
     if self.debug: print('Loading keypoints...')
     self.keypoints = keypoints
 
-    # Descriptors
+    # Load descriptors
     if self.debug: print('Loading descriptors...')
     self.descriptors = descriptors
 
-    # DataFrame
+    # Load DataFrame
     if self.debug: print('Loading DataFrame...')
     self.df = df
     
@@ -103,13 +103,14 @@ class Matching:
   def __FlannMatching(self, descr1, descr2):
     if descr1 is None or descr2 is None: return 0
 
+    # Find FLANN matches
     try:
       matches = self.flann.knnMatch(descr1, descr2, k=2)
       matchesMask = [[0,0] for i in range(len(matches))]
     except cv2.error as e:
       return 0
 
-    # ratio test.
+    # Ratio test on found matches
     good = 0
     for i,(m,n) in enumerate(matches):
       if( m.distance < 0.7*n.distance):
@@ -120,6 +121,7 @@ class Matching:
 
 
   def __MatchHist(self, hist_img1, hist_imgn):
+    # Compare given histograms and return value
     metric_val = cv2.compareHist(hist_img1, hist_imgn, cv2.HISTCMP_CORREL)
     return metric_val
 
@@ -197,7 +199,7 @@ class Matching:
     df_result = pd.merge(df_result, df_temp, on='naam')
     del dic, df_temp
 
-    # Make combined classification and take 20 best
+    # Make combined classification and take 20 best and sort on 'total' column
     df_result['total'] = df_result['flann'] * weightFlann + df_result['hist'] * weightHist + df_result['comred'] * weightComRed + df_result['patches'] * weightPatches
     #print(df_result.sort_values(by=['total'], ascending=False)[:3]) #REMOVE
     df_result = df_result.sort_values(by=['total'], ascending=False)[:20]
@@ -206,17 +208,20 @@ class Matching:
     # Add room name
     df_result['zaal'] = df_result['naam'].apply(lambda x: x.split('__')[0])
 
+    # Return 20 best results
     return df_result
   
 
 
   def __CheckRoomOccerenceSequence(self, guessedRoom, threshold):
+    # Count amount of times room was found in a row
     count = 0
     for room in self.lastMatches:
       if room == guessedRoom:
         count += 1
       else: count = 0
     
+    # Return True if amount is bigger than threshold
     if count >= threshold:
       return True
     else:

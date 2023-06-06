@@ -5,6 +5,7 @@ from ModuleDisplayScreen import ResizeImage
 class Floorplan:
     url = ''
 
+    # Coordinates of room in floorplan
     roomsCoord = {
         'zaal_A': [823, 999],
         'zaal_B': [639, 997],
@@ -51,30 +52,40 @@ class Floorplan:
 
 
     def __init__(self, url, debug=False):
+        # Get floorplan image
         self.url = url + '\\msk_floorplan.png'
 
 
     def DrawPath(self, roomSequence):
+        # Read image
         img = cv2.imread(self.url)
         
         if len(roomSequence) == 0: return ResizeImage(img)
 
         previousRoom = ''
+        # Draw circels of the rooms and connect them with a line
         for room in roomSequence:
             img = cv2.circle(img, self.roomsCoord[room], 10, [255, 0, 0], 10)
             if previousRoom != '':
                 img = cv2.line(img, self.roomsCoord[room], self.roomsCoord[previousRoom], [0, 0, 0], 3)
             previousRoom = room
+        # Draw circle of current room in other color
         img = cv2.circle(img, self.roomsCoord[roomSequence[-1]], 10, [0, 255, 0], 10)
+        # Resize image
         img = ResizeImage(img)
 
+        # Return floorplan
         return img
     
 
     def DrawRoom(self, room):
+        # Lower first letter of room
         room = room[0].lower() + room[1:]
+
+        # Draw circle on floorplan of given room
         img = cv2.imread(self.url)
         img = cv2.circle(img, self.roomsCoord[room], 10, [0, 255, 0], 10)
         img = ResizeImage(img)
 
+        # Return floorplan
         return img

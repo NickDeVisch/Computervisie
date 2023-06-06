@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 from sympy import Point, Line, Polygon
 
+# HSV values for filter
 roomColorMask = {
     'Zaal': ['zaal_1', 'zaal_2', 'zaal_5', 'zaal_6', 'zaal_7', 'zaal_8', 
              'zaal_9', 'zaal_10', 'zaal_11', 'zaal_12', 'zaal_13', 'zaal_14', 
@@ -57,7 +58,6 @@ df = pd.DataFrame(roomColorMask)
 def ReplaceColorWithWhite(image, lower_color, upper_color):
     # Converteer de afbeelding naar het HSV-kleursysteem
     hsv_image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
-    #hsv_image = cv2.resize(hsv_image, (int(hsv_image.shape[1] * 5 / 100), int(hsv_image.shape[0] * 5 / 100)), cv2.INTER_AREA)
     
     # Definieer het bereik van kleuren om te vervangen
     lower_bound = np.array(lower_color, dtype=np.uint8)
@@ -73,23 +73,23 @@ def ReplaceColorWithWhite(image, lower_color, upper_color):
     return replaced_image
 
 def CalculateDistance(point1, point2):
-    # Bereken de afstand tussen twee punten met de afstandformule
+    # Calculate distance between 2 points
     x_diff = point2[0] - point1[0]
     y_diff = point2[1] - point1[1]
     distance = np.sqrt(x_diff ** 2 + y_diff ** 2)
     return distance
 
 def CheckContourRatio(points, threshold):
-    # Bepaal de lengtes van de contourlijnen
+    # Calculate lenght of the 4 lines
     line1 = CalculateDistance(points[0, 0], points[1, 0])
     line2 = CalculateDistance(points[1, 0], points[2, 0])
     line3 = CalculateDistance(points[2, 0], points[3, 0])
     line4 = CalculateDistance(points[3, 0], points[0, 0])
     
-    # Bepaal de verhouding tussen de lengtes
+    # Determane ratio of the lines
     ratio = max(line1, line2, line3, line4) / min(line1, line2, line3, line4)
 
-    # Controleer of de verhouding kleiner is dan de drempelwaarde
+    # Return False if ratio is bigger than threshold
     if ratio > threshold:
         return False
     else:
@@ -116,14 +116,14 @@ def CalculateAngle(point1, point2, point3):
 
     return angle_deg
 
-def CheckCornerAngels(points, lowerThreshold, upperThreshold):
+def CheckCornerAngles(points, lowerThreshold, upperThreshold):
     # Get points
     point1 = points[0, 0]
     point2 = points[1, 0]
     point3 = points[2, 0]
     point4 = points[3, 0]
 
-    # Calculate corners
+    # Calculate angles of the corners
     corners = []
     corners.append(CalculateAngle(point4, point1, point2))
     corners.append(CalculateAngle(point1, point2, point3))
@@ -143,7 +143,7 @@ def CheckParallelogram(points, diffThreshold):
     point3 = points[2, 0]
     point4 = points[3, 0]
 
-    # Calculate corners
+    # Calculate angles of the corners
     corners = []
     corners.append(CalculateAngle(point4, point1, point2))
     corners.append(CalculateAngle(point1, point2, point3))
@@ -158,17 +158,19 @@ def CheckParallelogram(points, diffThreshold):
         return False
 
 def GetCornersFromContour(contour):
-    # Get corners
+    # Get corners from contour and add them to list
     corners = []
     for i in range(len(contour)):
       corners.append(contour[i, 0])
+
+    # Return list
     return corners
 
 def FiveToFourCorners(points, img):
     # Get corners
     corners = GetCornersFromContour(points)
 
-    # Get points that form shortest line
+    # Get the 2 points that form shortest line
     shortestDist = np.inf
     point1 = 0
     point2 = 0
@@ -182,7 +184,7 @@ def FiveToFourCorners(points, img):
     #img = cv2.circle(img, corners[point1], 7, [0, 0, 255], 5)
     #img = cv2.circle(img, corners[point2], 7, [255, 0, 0], 5)
 
-    # Get next point in contour
+    # Get next point in contour of first point
     shortestDist1 = np.inf
     point1_next = 0
     for i in range(len(corners)):
@@ -191,6 +193,7 @@ def FiveToFourCorners(points, img):
         shortestDist1 = dist
         point1_next = i
     
+    # Get next point in contour of second point
     shortestDist2 = np.inf
     point2_next = 0
     for i in range(len(corners)):
@@ -199,6 +202,7 @@ def FiveToFourCorners(points, img):
         shortestDist2 = dist
         point2_next = i
     
+    # Search other point if wrong one was found
     if point1_next == point2_next:
       if shortestDist1 < shortestDist2:
             shortestDist2 = np.inf
@@ -230,22 +234,24 @@ def FiveToFourCorners(points, img):
     p4 = Point(corners[point2_next])
     l2 = Line(p3, p4)
 
-    # Find intersection
+    # Find intersection of the 2 lines
     intersection = l1.intersection(l2)
     if intersection == []:
       return None
     newCorner = [int(intersection[0].x), int(intersection[0].y)]
     #img = cv2.circle(img, (int(intersection[0].x), int(intersection[0].y)), 7, [0, 255, 255], 5)
 
-    # Change corners of contour
+    # Make new contour from the calculated corner
     for i in range(len(corners)):
       if i != point1 and i != point1_next and i != point2 and i != point2_next:
         lastCorner = corners[i]
     newCorners = np.array([[newCorner],[ corners[point1_next]], [lastCorner], [corners[point2_next]]])
     
+    # Return new corners
     return newCorners
 
 def CheckPositionOfExtraxt(points, imgShape, border):
+    # Check if contour of painting touch border of frame within distance
     result = True
     for point in points:
       if point[0, 0] < border or point[0, 0] > imgShape[1] - border or point[0, 1] < border or point[0, 1] > imgShape[0] - border:
@@ -254,6 +260,7 @@ def CheckPositionOfExtraxt(points, imgShape, border):
     return result
 
 def GetMaskRoom(zaal):
+    # Get HSV mask for given room from dataFrame
     return df[df['Zaal'] == zaal]['Waarden'].values[0]
 
 def ReplaceColorWithWhite(image, roomSequence):
@@ -360,13 +367,19 @@ def FindPainting(img, roomSequence):
     quadrilateral_list = []
     for hull in hull_list:
       approx = cv2.approxPolyDP(hull, 0.015 * cv2.arcLength(hull, True), True)
+
+      # Found 4-point contour
       if len(approx) == 4:
+        # Check contour on properties
         if CheckContourRatio(approx, threshold_ratio) and CheckParallelogram(approx, threshold_diffAngle):
           quadrilateral_list.append(approx)
+      # Found 5-point contour
       if len(approx) == 5:
+        # Convert 5-point to 4-point
         newContour = FiveToFourCorners(approx, img)
         if newContour is not None: 
-          if CheckContourRatio(newContour, threshold_ratio) and CheckParallelogram(newContour, threshold_diffAngle) and CheckCornerAngels(newContour, threshold_lowerAngle, threshold_upperAngle):
+          # Check contour on properties
+          if CheckContourRatio(newContour, threshold_ratio) and CheckParallelogram(newContour, threshold_diffAngle) and CheckCornerAngles(newContour, threshold_lowerAngle, threshold_upperAngle):
             quadrilateral_list.append(newContour)
 
     # Filter out bad extraxts and raw quadrilateral => Wordt niet meer gebruikt
@@ -395,7 +408,7 @@ def FindPainting(img, roomSequence):
 
 
 
-def CheckCornersRelativeToPrevious(corners, previousCorners, distanceThreshold=45.0):
+def CheckCornersRelativeToPrevious(corners, previousCorners, distanceThreshold=45.0): # Wordt niet gebruikt
     if len(previousCorners) != 0:
       for painting in corners[0]:
         for corner in painting:

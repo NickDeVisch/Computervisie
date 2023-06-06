@@ -1,3 +1,4 @@
+# Import libraries
 import os
 import cv2
 import time
@@ -6,10 +7,12 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
+# Change settings
 np.seterr(invalid ='ignore')
 np.seterr(over ='ignore')
 warnings.filterwarnings("ignore", category=UserWarning)
 
+# Import modules
 from ModuleGetData import GetDataFromDrive
 from ModuleFindPainting_v2 import FindPainting, CheckCornersRelativeToPrevious
 from ModuleMatcher import Matching
@@ -20,6 +23,7 @@ from ModuleDisplayScreen import DisplayScreen, ResizeImage, CheckSharpnessOfImag
 url = 'D:\\School\\UGent\\AUT 5\\Computervisie\\Computervisie'
 #url = 'D:\\1_School\\Ugent\\Masterjaar\\2_Computervisie\\Project'  #LOUIS
 
+# Main
 if __name__ == '__main__':
     # Load video
     videoUrl =  url + '\\Videos\\GoPro\\MSK_16.mp4'
